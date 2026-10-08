@@ -1,4 +1,9 @@
 import 'dart:async';
+import 'dart:math' as math;
+import '../models/camera_display_settings.dart';
+import '../services/camera_display_store.dart';
+import '../widgets/camera_timer_panel.dart';
+import '../widgets/draggable_camera_panel.dart';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -7,15 +12,20 @@ import '../models/workout_plan.dart';
 import '../services/camera_workout_session.dart';
 import '../services/recording_archive.dart';
 import '../services/video_capture.dart';
-import '../services/workout_controller.dart';
 import '../services/workout_feedback.dart';
 import '../theme/app_theme.dart';
 import 'recordings_screen.dart';
 
 class CameraWorkoutScreen extends StatefulWidget {
-  const CameraWorkoutScreen({super.key, required this.plan, this.session});
+  const CameraWorkoutScreen({
+    super.key,
+    required this.plan,
+    this.session,
+    this.displayStore,
+  });
   final WorkoutPlan plan;
   final CameraWorkoutSession? session;
+  final CameraDisplayStore? displayStore;
   @override
   State<CameraWorkoutScreen> createState() => _CameraWorkoutScreenState();
 }
@@ -23,6 +33,8 @@ class CameraWorkoutScreen extends StatefulWidget {
 class _CameraWorkoutScreenState extends State<CameraWorkoutScreen>
     with WidgetsBindingObserver {
   late final CameraWorkoutSession _session;
+  late final CameraDisplayStore _displayStore;
+  bool _displayLoaded = false;
   bool _leaving = false;
   bool _confirming = false;
   @override
@@ -41,11 +53,59 @@ class _CameraWorkoutScreenState extends State<CameraWorkoutScreen>
     unawaited(
       SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]),
     );
-    unawaited(_session.initialize());
+    _displayStore = widget.displayStore ?? CameraDisplayStore();
+    unawaited(_initialize());
+  }
+
+  Future<void> _initialize() async {
+    await _session.initialize();
+    CameraDisplaySettings settings = const CameraDisplaySettings();
+    try {
+      settings = await _displayStore.load();
+    } catch (_) {
+      if (mounted) {
+        _notice(
+          'Tetapan paparan tidak dapat dibaca. Menggunakan tetapan asal.',
+        );
+      }
+    }
+    if (!mounted) return;
+    // Permission errors can be retried later; retain the loaded settings.
+    _loadedDisplay = settings;
+    if (_session.status == CaptureStatus.ready) _session.setDisplay(settings);
+    setState(() => _displayLoaded = true);
+  }
+
+  CameraDisplaySettings? _loadedDisplay;
+  void _notice(String message) => ScaffoldMessenger.of(
+    context,
+  ).showSnackBar(SnackBar(content: Text(message)));
+  Future<void> _saveDisplay() async {
+    try {
+      await _displayStore.save(_session.display);
+    } catch (_) {
+      if (mounted) {
+        _notice(
+          'Tetapan digunakan untuk sesi ini, tetapi belum disimpan. Cuba ubah tetapan semula.',
+        );
+      }
+    }
+  }
+
+  void _setDisplay(CameraDisplaySettings value) {
+    _loadedDisplay = null;
+    _session.setDisplay(value);
   }
 
   void _changed() {
     if (!mounted) return;
+    if (_displayLoaded &&
+        _loadedDisplay != null &&
+        _session.status == CaptureStatus.ready) {
+      final settings = _loadedDisplay!;
+      _loadedDisplay = null;
+      _session.setDisplay(settings);
+    }
     setState(() {});
     if (_session.recording != null && !_leaving) {
       _leaving = true;
@@ -134,20 +194,12 @@ class _CameraWorkoutScreenState extends State<CameraWorkoutScreen>
     super.dispose();
   }
 
-  Widget _scrollControls(Widget child) => LayoutBuilder(
-    builder: (context, constraints) => SingleChildScrollView(
-      child: ConstrainedBox(
-        constraints: BoxConstraints(minHeight: constraints.maxHeight),
-        child: IntrinsicHeight(child: child),
-      ),
-    ),
-  );
-
   @override
   Widget build(BuildContext context) {
-    final timer = _session.timer;
-    final rest = timer.phase == WorkoutPhase.rest;
-    final color = rest ? AppColors.orange : AppColors.green;
+    final editable =
+        _displayLoaded &&
+        _session.status == CaptureStatus.ready &&
+        !_session.timer.hasStarted;
     return PopScope(
       canPop:
           !_session.busy && !_session.isRecording && !_session.hasPendingVideo,
@@ -156,239 +208,200 @@ class _CameraWorkoutScreenState extends State<CameraWorkoutScreen>
       },
       child: Scaffold(
         backgroundColor: Colors.black,
-        body: Stack(
-          fit: StackFit.expand,
-          children: [
-            Center(child: _session.capture.preview()),
-            const DecoratedBox(
-              decoration: BoxDecoration(
-                gradient: LinearGradient(
-                  begin: Alignment.topCenter,
-                  end: Alignment.bottomCenter,
-                  colors: [Colors.black87, Colors.transparent, Colors.black87],
-                  stops: [0, .4, 1],
-                ),
-              ),
-            ),
-            SafeArea(
+        body: SafeArea(
+          child: LayoutBuilder(
+            builder: (context, constraints) => SingleChildScrollView(
               child: Padding(
-                padding: const EdgeInsets.all(20),
-                child: _scrollControls(
-                  Column(
-                    children: [
-                      Row(
-                        children: [
-                          IconButton(
-                            tooltip: 'Kembali',
-                            onPressed: () => Navigator.maybePop(context),
-                            icon: const Icon(Icons.arrow_back_rounded),
-                          ),
-                          Expanded(
-                            child: Text(
-                              widget.plan.name,
-                              maxLines: 2,
-                              overflow: TextOverflow.ellipsis,
-                              style: const TextStyle(
-                                fontWeight: FontWeight.w700,
-                                fontSize: 18,
-                              ),
+                padding: const EdgeInsets.all(12),
+                child: Column(
+                  children: [
+                    Row(
+                      children: [
+                        IconButton(
+                          tooltip: 'Kembali',
+                          onPressed: () => Navigator.maybePop(context),
+                          icon: const Icon(Icons.arrow_back_rounded),
+                        ),
+                        Expanded(
+                          child: Text(
+                            widget.plan.name,
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            style: const TextStyle(
+                              fontWeight: FontWeight.w700,
+                              fontSize: 18,
                             ),
                           ),
-                          if (_session.isRecording)
-                            const Row(
+                        ),
+                        if (_session.isRecording)
+                          const Text(
+                            '● REC',
+                            style: TextStyle(
+                              color: Colors.redAccent,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        IconButton(
+                          tooltip: 'Tukar kamera',
+                          onPressed: editable && _session.capture.canSwitch
+                              ? _session.switchCamera
+                              : null,
+                          icon: const Icon(Icons.flip_camera_android_outlined),
+                        ),
+                      ],
+                    ),
+                    Row(
+                      children: [
+                        Expanded(
+                          child: Text(
+                            _session.capture.front
+                                ? 'Kamera depan'
+                                : 'Kamera belakang',
+                            style: const TextStyle(fontSize: 12),
+                          ),
+                        ),
+                        const Text('Mikrofon', style: TextStyle(fontSize: 12)),
+                        Switch(
+                          value: _session.microphone,
+                          onChanged:
+                              !_session.busy &&
+                                  !_session.isRecording &&
+                                  !_session.hasPendingVideo
+                              ? _session.setMicrophone
+                              : null,
+                        ),
+                      ],
+                    ),
+                    Wrap(
+                      spacing: 8,
+                      crossAxisAlignment: WrapCrossAlignment.center,
+                      children: [
+                        const Text('Tema', style: TextStyle(fontSize: 12)),
+                        ChoiceChip(
+                          label: const Text('Standard'),
+                          selected: !_session.display.transparent,
+                          onSelected: editable
+                              ? (_) {
+                                  _setDisplay(
+                                    _session.display.copyWith(
+                                      transparent: false,
+                                    ),
+                                  );
+                                  unawaited(_saveDisplay());
+                                }
+                              : null,
+                        ),
+                        ChoiceChip(
+                          label: const Text('Transparent'),
+                          selected: _session.display.transparent,
+                          onSelected: editable
+                              ? (_) {
+                                  _setDisplay(
+                                    _session.display.copyWith(
+                                      transparent: true,
+                                    ),
+                                  );
+                                  unawaited(_saveDisplay());
+                                }
+                              : null,
+                        ),
+                        IconButton(
+                          tooltip: 'Reset paparan',
+                          onPressed: editable
+                              ? () {
+                                  _setDisplay(const CameraDisplaySettings());
+                                  unawaited(_saveDisplay());
+                                }
+                              : null,
+                          icon: const Icon(Icons.restart_alt),
+                        ),
+                      ],
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.only(bottom: 8),
+                      child: Text(
+                        _session.isRecording
+                            ? 'Kedudukan dan tema dikunci semasa rakaman.'
+                            : 'Seret panel untuk ubah kedudukan sebelum mula.',
+                        textAlign: TextAlign.center,
+                        style: const TextStyle(
+                          fontSize: 11,
+                          color: Colors.white70,
+                        ),
+                      ),
+                    ),
+                    SizedBox(
+                      height: math.max(240, constraints.maxHeight - 310),
+                      child: Center(
+                        child: AspectRatio(
+                          aspectRatio: _session.capture.portraitAspectRatio,
+                          child: ClipRect(
+                            child: Stack(
+                              fit: StackFit.expand,
                               children: [
-                                Icon(
-                                  Icons.circle,
-                                  color: Colors.redAccent,
-                                  size: 10,
-                                ),
-                                SizedBox(width: 6),
-                                Text(
-                                  'REC',
-                                  style: TextStyle(fontWeight: FontWeight.w800),
+                                _session.capture.preview(),
+                                DraggableCameraPanel(
+                                  settings: _session.display,
+                                  onChanged: editable ? _setDisplay : null,
+                                  onChangeEnd: () => unawaited(_saveDisplay()),
+                                  child: CameraTimerPanel(
+                                    plan: widget.plan,
+                                    timer: _session.timer,
+                                    settings: _session.display,
+                                    recording: _session.isRecording,
+                                  ),
                                 ),
                               ],
                             ),
-                          if (!_session.isRecording)
-                            IconButton(
-                              tooltip: 'Tukar kamera',
-                              onPressed:
-                                  _session.status == CaptureStatus.ready &&
-                                      _session.capture.canSwitch
-                                  ? _session.switchCamera
-                                  : null,
-                              icon: const Icon(
-                                Icons.flip_camera_android_outlined,
-                              ),
-                            ),
-                        ],
+                          ),
+                        ),
                       ),
-                      if (!_session.isRecording &&
-                          !_session.busy &&
-                          !_session.hasPendingVideo)
-                        Row(
+                    ),
+                    if (_session.error != null)
+                      Padding(
+                        padding: const EdgeInsets.all(12),
+                        child: Column(
                           children: [
-                            Icon(
-                              _session.capture.front
-                                  ? Icons.person_outline
-                                  : Icons.landscape_outlined,
-                              size: 18,
+                            Text(
+                              _session.error!,
+                              style: const TextStyle(color: AppColors.orange),
                             ),
-                            const SizedBox(width: 8),
-                            Expanded(
-                              child: Text(
-                                _session.capture.front
-                                    ? 'Kamera depan'
-                                    : 'Kamera belakang',
-                                style: const TextStyle(fontSize: 12),
-                              ),
-                            ),
-                            const Text(
-                              'Mikrofon',
-                              style: TextStyle(fontSize: 12),
-                            ),
-                            Switch(
-                              value: _session.microphone,
-                              onChanged: _session.setMicrophone,
-                            ),
-                          ],
-                        ),
-                      const Spacer(),
-                      if (_session.error != null)
-                        Container(
-                          padding: const EdgeInsets.all(16),
-                          decoration: BoxDecoration(
-                            color: AppColors.surface,
-                            borderRadius: BorderRadius.circular(16),
-                          ),
-                          child: Column(
-                            children: [
-                              Text(
-                                _session.error!,
-                                style: const TextStyle(
-                                  color: AppColors.orange,
-                                  height: 1.4,
-                                ),
-                              ),
-                              const SizedBox(height: 12),
-                              if (_session.hasPendingVideo)
-                                FilledButton(
-                                  onPressed: _session.retrySave,
-                                  child: const Text('CUBA SIMPAN SEMULA'),
-                                )
-                              else
-                                Wrap(
-                                  spacing: 12,
-                                  children: [
-                                    TextButton(
-                                      onPressed: _session.initialize,
-                                      child: const Text('CUBA LAGI'),
-                                    ),
-                                    TextButton(
-                                      onPressed: () => DeviceRecordingArchive
-                                          .channel
-                                          .invokeMethod<void>('settings'),
-                                      child: const Text('TETAPAN'),
-                                    ),
-                                  ],
-                                ),
-                            ],
-                          ),
-                        ),
-                      if (_session.error == null)
-                        Container(
-                          padding: const EdgeInsets.all(20),
-                          decoration: BoxDecoration(
-                            color: Colors.black.withValues(alpha: .68),
-                            borderRadius: BorderRadius.circular(24),
-                            border: Border.all(
-                              color: color.withValues(alpha: .6),
-                            ),
-                          ),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.stretch,
-                            children: [
-                              Text(
-                                '${_session.isRecording ? (rest ? 'REHAT' : 'SENAMAN') : 'BERSEDIA'}  •  GERAKAN ${timer.index + 1}/${widget.plan.exercises.length}',
-                                style: TextStyle(
-                                  color: color,
-                                  fontSize: 11,
-                                  letterSpacing: 1,
-                                  fontWeight: FontWeight.w800,
-                                ),
-                              ),
-                              const SizedBox(height: 10),
-                              Row(
+                            if (_session.hasPendingVideo)
+                              FilledButton(
+                                onPressed: _session.retrySave,
+                                child: const Text('CUBA SIMPAN SEMULA'),
+                              )
+                            else
+                              Wrap(
+                                spacing: 12,
                                 children: [
-                                  Expanded(
-                                    child: Text(
-                                      rest
-                                          ? 'Tarik nafas seketika.'
-                                          : timer.currentExercise.name,
-                                      maxLines: 2,
-                                      overflow: TextOverflow.ellipsis,
-                                      style: const TextStyle(
-                                        fontSize: 24,
-                                        fontWeight: FontWeight.w800,
-                                      ),
-                                    ),
+                                  TextButton(
+                                    onPressed: _session.initialize,
+                                    child: const Text('CUBA LAGI'),
                                   ),
-                                  const SizedBox(width: 12),
-                                  Column(
-                                    children: [
-                                      Text(
-                                        '${timer.remainingSeconds}',
-                                        style: TextStyle(
-                                          color: color,
-                                          fontSize: 48,
-                                          fontWeight: FontWeight.w800,
-                                          fontFeatures: const [
-                                            FontFeature.tabularFigures(),
-                                          ],
-                                        ),
-                                      ),
-                                      const Text(
-                                        'SAAT',
-                                        style: TextStyle(
-                                          fontSize: 10,
-                                          letterSpacing: 2,
-                                        ),
-                                      ),
-                                    ],
+                                  TextButton(
+                                    onPressed: () => DeviceRecordingArchive
+                                        .channel
+                                        .invokeMethod<void>('settings'),
+                                    child: const Text('TETAPAN'),
                                   ),
                                 ],
                               ),
-                              const SizedBox(height: 12),
-                              LinearProgressIndicator(
-                                value: timer.progress,
-                                color: color,
-                                backgroundColor: Colors.white12,
-                                borderRadius: BorderRadius.circular(4),
-                              ),
-                              const SizedBox(height: 14),
-                              Text(
-                                'Seterusnya: ${timer.nextExercise?.name ?? 'Selesai'}',
-                                maxLines: 2,
-                                overflow: TextOverflow.ellipsis,
-                                style: const TextStyle(
-                                  fontSize: 12,
-                                  color: Colors.white70,
-                                ),
-                              ),
-                            ],
-                          ),
+                          ],
                         ),
-                      const SizedBox(height: 16),
-                      if (_session.busy) ...[
-                        const LinearProgressIndicator(),
-                        const SizedBox(height: 12),
-                        Text(
-                          _session.status == CaptureStatus.saving
-                              ? 'Menyimpan rakaman…'
-                              : 'Menyediakan kamera…',
-                        ),
-                      ] else if (!_session.hasPendingVideo)
-                        FilledButton.icon(
+                      ),
+                    const SizedBox(height: 12),
+                    if (_session.busy || !_displayLoaded) ...[
+                      const LinearProgressIndicator(),
+                      Text(
+                        _session.status == CaptureStatus.saving
+                            ? 'Menyimpan rakaman…'
+                            : 'Menyediakan kamera…',
+                      ),
+                    ] else if (!_session.hasPendingVideo)
+                      SizedBox(
+                        width: double.infinity,
+                        child: FilledButton.icon(
                           onPressed: _session.isRecording
                               ? _session.stop
                               : _session.status == CaptureStatus.ready
@@ -410,24 +423,23 @@ class _CameraWorkoutScreenState extends State<CameraWorkoutScreen>
                                 : 'MULA & RAKAM',
                           ),
                         ),
-                      const SizedBox(height: 12),
-                      Text(
-                        _session.isRecording
-                            ? 'Rakaman tamat secara automatik selepas gerakan terakhir.'
-                            : 'Pemasa dan gerakan turut dimasukkan dalam video.\n${_session.microphone ? 'Mikrofon dihidupkan.' : 'Rakaman senyap • Hidupkan mikrofon untuk audio.'}',
-                        textAlign: TextAlign.center,
-                        style: const TextStyle(
-                          color: Colors.white70,
-                          fontSize: 11,
-                          height: 1.4,
-                        ),
                       ),
-                    ],
-                  ),
+                    const SizedBox(height: 8),
+                    Text(
+                      _session.isRecording
+                          ? 'Rakaman tamat selepas gerakan terakhir.'
+                          : 'Kedudukan dan tema ini turut digunakan dalam video.',
+                      textAlign: TextAlign.center,
+                      style: const TextStyle(
+                        color: Colors.white70,
+                        fontSize: 11,
+                      ),
+                    ),
+                  ],
                 ),
               ),
             ),
-          ],
+          ),
         ),
       ),
     );

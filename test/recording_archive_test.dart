@@ -1,3 +1,4 @@
+import 'package:gym_timer/models/camera_display_settings.dart';
 import 'dart:io';
 
 import 'package:flutter/services.dart';
@@ -38,7 +39,11 @@ void main() {
     'raw video and routine metadata persist across archive instances',
     () async {
       final path = await source();
-      final item = await archive.keep(path, plan);
+      final item = await archive.keep(
+        path,
+        plan,
+        display: const CameraDisplaySettings(x: .1, y: .2, transparent: true),
+      );
       expect(await File(path).exists(), false);
       final reopened = DeviceRecordingArchive(
         directory: Directory('${root.path}/recordings'),
@@ -47,12 +52,21 @@ void main() {
       expect(all.single.id, item.id);
       expect(all.single.plan.exercises.single.workoutSeconds, 3);
       expect(all.single.exported, false);
+      expect(all.single.display!.toJson(), {
+        'x': .1,
+        'y': .2,
+        'transparent': true,
+      });
     },
   );
   test(
     'export failure preserves original; retry atomically publishes overlay',
     () async {
-      final item = await archive.keep(await source(), plan);
+      final item = await archive.keep(
+        await source(),
+        plan,
+        display: const CameraDisplaySettings(y: .15, transparent: true),
+      );
       final messenger =
           TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger;
       messenger.setMockMethodCallHandler(
@@ -74,11 +88,14 @@ void main() {
         expect(call.method, 'export');
         final args = call.arguments as Map;
         expect((args['plan'] as Map)['name'], plan.name);
+        expect(args['display'], item.display!.toJson());
         await File(args['source'] as String).copy(args['output'] as String);
         return null;
       });
       final exported = await archive.export(item);
       expect(exported.exported, true);
+      expect(exported.display!.y, .15);
+      expect((await archive.list()).single.display!.transparent, true);
       expect((await archive.list()).single.exported, true);
       expect(
         await File('${root.path}/recordings/${item.id}.mp4').exists(),

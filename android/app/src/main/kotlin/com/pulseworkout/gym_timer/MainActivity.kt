@@ -44,7 +44,7 @@ class MainActivity : FlutterActivity() {
                             val plan = requireNotNull(call.argument<Map<String, Any?>>("plan"))
                             require(File(source).isFile && source != output.path)
                             require(!output.exists())
-                            val overlay = WorkoutVideoOverlay(plan)
+                            val overlay = WorkoutVideoOverlay(plan, call.argument<Map<String, Any?>>("display"))
                             val item = EditedMediaItem.Builder(MediaItem.fromUri(Uri.fromFile(File(source))))
                                 .setEffects(Effects(emptyList(), listOf(OverlayEffect(ImmutableList.of<TextureOverlay>(overlay)))))
                                 .build()

@@ -1,5 +1,29 @@
 # Changelog
 
+## [1.3.0] — 2026-10-08
+
+### Ditambah
+
+- Seret panel pemasa dalam bingkai kamera sebelum mula merakam, termasuk bahagian atas dan tengah.
+- Pilihan tema **Standard** (latar gelap) dan **Transparent** (tanpa latar dengan bayang teks).
+- Tetapan kedudukan/tema disimpan untuk sesi seterusnya; butang **Reset paparan** memulihkan paparan asal.
+- Kedudukan dan tema turut digunakan dalam MP4 eksport, serta disimpan bersama metadata setiap rakaman untuk retry yang konsisten.
+- Tindakan pembaca skrin untuk memindahkan panel ke atas, tengah atau bawah.
+
+### Diperbaiki
+
+- Panel dihadkan dalam sempadan video supaya teks tidak terpotong apabila diseret ke tepi.
+- Pratonton menggunakan nisbah kamera sebenar; kawalan diletakkan di luar bingkai rakaman.
+- Rakaman lama tanpa tetapan paparan mengekalkan susun atur eksport versi 1.2.
+
+### Pengesahan dan nota
+
+- 42 ujian lulus, termasuk seretan, had kedudukan, tema, pemulihan tetapan dan metadata rakaman lama.
+- Eksport Transparent di atas dan Standard di tengah disahkan pada emulator, termasuk simpan ke galeri dan tetapan selepas restart.
+- Kedudukan/tema dikunci semasa rakaman; ubah sebelum menekan **MULA & RAKAM**.
+- Versi `1.3.0+4`; APK menggunakan kunci debug tempatan yang sama.
+- Kamera sintetik emulator digunakan untuk pengesahan; telefon fizikal belum diuji.
+
 ## [1.2.0] — 2026-10-08
 
 ### Ditambah
@@ -70,3 +94,5 @@
 [1.1.0]: https://github.com/muhamadsyafiee/bisiq-pulse/releases/tag/v1.1.0
 
 [1.2.0]: https://github.com/muhamadsyafiee/bisiq-pulse/releases/tag/v1.2.0
+
+[1.3.0]: https://github.com/muhamadsyafiee/bisiq-pulse/releases/tag/v1.3.0

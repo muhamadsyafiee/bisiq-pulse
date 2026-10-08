@@ -42,6 +42,15 @@ adb install -r build/app/outputs/flutter-apk/app-release.apk
 
 Konfigurasi lalai menggunakan debug signing bagi APK release untuk pemasangan dan ujian tempatan. Sebelum edaran rasmi/Play Store, konfigurasi kunci release milik anda mengikut [panduan signing Flutter](https://docs.flutter.dev/deployment/android#sign-the-app). Jangan komit fail keystore atau kata laluan.
 
+## Paparan kamera — versi 1.3.0
+
+- Di **RAKAM LATIHAN**, seret panel pemasa ke kedudukan yang dikehendaki dalam bingkai kamera sebelum menekan **MULA & RAKAM**. Panel kekal sepenuhnya di dalam video, dengan ruang kecil di tepi.
+- Pilih **Standard** untuk panel berlatar gelap atau **Transparent** untuk teks tanpa latar panel. Teks Transparent mempunyai bayang untuk membantu pembacaan.
+- **Reset paparan** memulihkan kedudukan bawah tengah dan tema Standard. Kedudukan dan tema disimpan secara automatik untuk sesi seterusnya, termasuk selepas aplikasi dibuka semula.
+- Kedudukan dan tema dikunci semasa rakaman. Pilihan disimpan bersama setiap video, supaya eksport atau retry kemudian menggunakan tetapan sesi tersebut walaupun pilihan baharu telah dibuat.
+- Bingkai pratonton menggunakan nisbah kamera potret; kedudukan panel dikira relatif kepada video, bukan ruang butang atau skrin telefon. Video lama versi 1.2 mengekalkan susun atur lamanya.
+- Pengguna pembaca skrin boleh menggunakan tindakan panel **Pindah ke atas**, **Pindah ke tengah** atau **Pindah ke bawah**.
+
 ## Rakaman kamera — versi 1.2.0
 
 1. Pilih rutin di **Latihan Saya**, kemudian tekan **RAKAM LATIHAN**.
@@ -96,6 +105,7 @@ Aplikasi ini **tidak menggunakan Android foreground service**. Bunyi dimainkan k
 lib/
   main.dart                       # Tema dan titik mula aplikasi
   data/workout_presets.dart       # Katalog tiga template
+  models/camera_display_settings.dart # Kedudukan relatif dan tema panel
   models/workout_recording.dart   # Metadata rakaman dan status eksport
   models/exercise.dart            # Gerakan dan serialisasi JSON
   models/workout_plan.dart        # Rutin tersimpan dengan ID unik
@@ -105,6 +115,7 @@ lib/
   screens/camera_workout_screen.dart # Kamera dan pemasa langsung
   screens/recordings_screen.dart  # Eksport, simpan galeri dan padam salinan
   screens/workout_screen.dart     # UI pemasa, lifecycle dan kawalan
+  services/camera_display_store.dart # Simpan tetapan paparan kamera
   services/video_capture.dart    # Kamera depan/belakang dan rakaman
   services/camera_workout_session.dart # Urutan rakaman dan lifecycle
   services/recording_archive.dart # Arkib video tempatan dan eksport native
@@ -113,6 +124,8 @@ lib/
   services/workout_library.dart   # Penyimpanan tempatan dan pengurusan rutin
   theme/app_theme.dart            # Warna dan gaya komponen
   widgets/
+    camera_timer_panel.dart       # Panel pemasa dalam pratonton kamera
+    draggable_camera_panel.dart   # Seret panel dalam sempadan video
     timer_ring.dart               # Ring tersuai, tiada percent_indicator
     exercise_tile.dart            # Baris senarai gerakan
 assets/audio/                     # Empat WAV asli, disertakan dalam APK
@@ -131,7 +144,7 @@ Ujian meliputi urutan workout/rest/finished, kira detik 3–2–1, pause/resume 
 
 Bunyi WAV dijana sendiri melalui `python3 scripts/generate_audio.py` dan boleh digunakan bersama projek ini. Pakej dikunci melalui `pubspec.lock`.
 
-Binaan ini telah lulus 37 ujian dan analisis statik, serta berjaya dipasang dan diuji pada emulator Android API 36. Lihat [rekod pengesahan](docs/VERIFICATION.md) dan [tangkapan skrin Latihan Saya](docs/screenshots/library.png).
+Binaan ini telah lulus 42 ujian dan analisis statik, serta berjaya dipasang dan diuji pada emulator Android API 36. Lihat [rekod pengesahan](docs/VERIFICATION.md) dan [tangkapan skrin Latihan Saya](docs/screenshots/library.png).
 
 Ujian kamera turut meliputi izin ditolak, kegagalan mula/simpan, retry, operasi serentak, penamat automatik, gangguan ketika mula, eksport gagal tanpa kehilangan video asal dan skrin kecil dengan fon besar. Rakaman dan eksport diuji menggunakan kamera sintetik emulator; kamera dan mikrofon telefon fizikal masih perlu diuji.
 

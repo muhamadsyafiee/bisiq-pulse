@@ -16,7 +16,7 @@ import kotlin.math.max
 /** Draws from video timestamps rather than wall time, so encoding speed does
  * not affect the workout countdown. Camera mode records one continuous take. */
 @UnstableApi
-class WorkoutVideoOverlay(plan: Map<String, Any?>) : BitmapOverlay() {
+class WorkoutVideoOverlay(plan: Map<String, Any?>, private val display: Map<String, Any?>? = null) : BitmapOverlay() {
     private data class Exercise(val name: String, val work: Int, val rest: Int)
     private data class Frame(val index: Int, val rest: Boolean, val seconds: Int, val progress: Float, val finished: Boolean = false)
     private val title = plan["name"] as String
@@ -27,7 +27,8 @@ class WorkoutVideoOverlay(plan: Map<String, Any?>) : BitmapOverlay() {
     private var bitmap = Bitmap.createBitmap(1, 1, Bitmap.Config.ARGB_8888)
     private val paint = Paint(Paint.ANTI_ALIAS_FLAG)
     private var lastKey = ""
-    private val settings = StaticOverlaySettings.Builder()
+    private val transparent = display?.get("transparent") == true
+    private var settings = StaticOverlaySettings.Builder()
         .setBackgroundFrameAnchor(0f, -0.85f)
         .setOverlayFrameAnchor(0f, -1f).build()
 
@@ -36,8 +37,22 @@ class WorkoutVideoOverlay(plan: Map<String, Any?>) : BitmapOverlay() {
     override fun configure(videoSize: Size) {
         super.configure(videoSize)
         bitmap.recycle()
-        val width = max(240, (videoSize.width * .90f).toInt())
+        val width = max(240, (videoSize.width * (if (display == null) .90f else .84f)).toInt())
         bitmap = Bitmap.createBitmap(width, (width * .43f).toInt(), Bitmap.Config.ARGB_8888)
+        if (display != null) {
+            fun position(key: String, fallback: Float): Float {
+                val value = (display[key] as? Number)?.toFloat() ?: fallback
+                return if (value.isFinite()) value.coerceIn(0f, 1f) else fallback
+            }
+            val marginX = videoSize.width * .02f
+            val marginY = videoSize.height * .02f
+            val left = marginX + position("x", .5f) * max(0f, videoSize.width - width - 2 * marginX)
+            val top = marginY + position("y", .92f) * max(0f, videoSize.height - bitmap.height - 2 * marginY)
+            settings = StaticOverlaySettings.Builder()
+                .setBackgroundFrameAnchor(2 * (left + width / 2f) / videoSize.width - 1,
+                    1 - 2 * (top + bitmap.height / 2f) / videoSize.height)
+                .setOverlayFrameAnchor(0f, 0f).build()
+        }
         lastKey = ""
     }
 
@@ -64,8 +79,10 @@ class WorkoutVideoOverlay(plan: Map<String, Any?>) : BitmapOverlay() {
         val w = bitmap.width.toFloat()
         val h = bitmap.height.toFloat()
         val accent = Color.parseColor(if (frame.rest) "#FFC16E" else "#B6F36A")
-        paint.color = Color.argb(218, 16, 20, 18)
-        canvas.drawRoundRect(0f, 0f, w, h, w * .025f, w * .025f, paint)
+        if (!transparent) {
+            paint.color = Color.argb(218, 16, 20, 18)
+            canvas.drawRoundRect(0f, 0f, w, h, w * .025f, w * .025f, paint)
+        }
         fun text(value: String, x: Float, y: Float, size: Float, color: Int, maxWidth: Float) {
             paint.color = color
             paint.typeface = Typeface.create("sans-serif", Typeface.BOLD)
@@ -75,7 +92,9 @@ class WorkoutVideoOverlay(plan: Map<String, Any?>) : BitmapOverlay() {
                 while (visible.isNotEmpty() && paint.measureText("$visible…") > maxWidth) visible = visible.dropLast(1)
                 visible += "…"
             }
+            if (transparent) paint.setShadowLayer(w * .01f, 0f, w * .0025f, Color.BLACK)
             canvas.drawText(visible, x, y, paint)
+            paint.clearShadowLayer()
         }
         val pad = w * .045f
         text("PULSE  •  $title", pad, w * .065f, w * .032f, Color.LTGRAY, w - pad * 2)

@@ -1,3 +1,4 @@
+import 'package:gym_timer/models/camera_display_settings.dart';
 import 'dart:async';
 
 import 'package:flutter/material.dart';
@@ -14,6 +15,8 @@ import 'widget_test.dart' show FakeFeedback;
 class FakeCapture implements VideoCapture {
   @override
   bool ready = false;
+  @override
+  double get portraitAspectRatio => 9 / 16;
   @override
   bool front = true;
   @override
@@ -59,11 +62,16 @@ class FakeArchive implements RecordingArchive {
   bool failKeep = false;
   final items = <WorkoutRecording>[];
   @override
-  Future<WorkoutRecording> keep(String source, WorkoutPlan plan) async {
+  Future<WorkoutRecording> keep(
+    String source,
+    WorkoutPlan plan, {
+    CameraDisplaySettings? display,
+  }) async {
     if (failKeep) throw StateError('disk full');
     final item = WorkoutRecording(
       id: 'recording',
       plan: plan,
+      display: display,
       createdAt: DateTime(2026),
     );
     items.add(item);
@@ -208,6 +216,24 @@ void main() {
       expect(session.recording, isNotNull);
     },
   );
+  test('recording snapshots display and rejects changes after start', () async {
+    await session.initialize();
+    session.setDisplay(
+      const CameraDisplaySettings(x: .2, y: .1, transparent: true),
+    );
+    await session.start();
+    session.setDisplay(const CameraDisplaySettings());
+    archive.failKeep = true;
+    await session.stop();
+    session.setDisplay(const CameraDisplaySettings());
+    archive.failKeep = false;
+    await session.retrySave();
+    expect(archive.items.single.display!.toJson(), {
+      'x': .2,
+      'y': .1,
+      'transparent': true,
+    });
+  });
   test('failed storage keeps stopped file available for retry', () async {
     await session.initialize();
     await session.start();

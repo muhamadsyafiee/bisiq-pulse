@@ -1,3 +1,4 @@
+import '../models/camera_display_settings.dart';
 import 'dart:async';
 
 import 'package:flutter/foundation.dart';
@@ -49,6 +50,14 @@ class CameraWorkoutSession extends ChangeNotifier {
   WorkoutRecording? recording;
   String? error;
   String? _pendingPath;
+  CameraDisplaySettings _display = const CameraDisplaySettings();
+  CameraDisplaySettings get display => _display;
+  void setDisplay(CameraDisplaySettings value) {
+    if (status != CaptureStatus.ready || timer.hasStarted) return;
+    _display = value;
+    _notify();
+  }
+
   bool microphone = false;
   bool interrupted = false;
   bool _foreground = true;
@@ -158,7 +167,7 @@ class CameraWorkoutSession extends ChangeNotifier {
     _notify();
     try {
       _pendingPath = await capture.stop();
-      recording = await archive.keep(_pendingPath!, plan);
+      recording = await archive.keep(_pendingPath!, plan, display: _display);
       _pendingPath = null;
       status = CaptureStatus.finished;
     } catch (_) {
@@ -179,7 +188,7 @@ class CameraWorkoutSession extends ChangeNotifier {
     status = CaptureStatus.saving;
     _notify();
     try {
-      recording = await archive.keep(_pendingPath!, plan);
+      recording = await archive.keep(_pendingPath!, plan, display: _display);
       _pendingPath = null;
       error = null;
       status = CaptureStatus.finished;

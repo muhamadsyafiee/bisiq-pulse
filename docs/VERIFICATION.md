@@ -1,4 +1,47 @@
-# Pengesahan binaan 1.2.0+3
+# Pengesahan binaan 1.3.0+4
+
+Tarikh: 8 Oktober 2026
+
+- `flutter analyze`: tiada isu.
+- `flutter test`: 42 ujian lulus; lima kes baharu dan ujian arkib sedia ada diperluas untuk metadata paparan.
+- `flutter build apk --release`: berjaya, APK universal 54,043,012 bait (54.0 MB).
+- `apksigner verify --verbose`: tandatangan v2 sah menggunakan kunci debug tempatan.
+- `aapt dump badging`: versi 1.3.0, versionCode 4, minimum Android API 24.
+- APK dipasang sebagai kemas kini pada emulator Android API 36 arm64; rutin dan rakaman versi 1.2 kekal tersedia.
+
+## Semakan paparan kamera
+
+1. Seret panel dari bawah ke atas kiri dalam pratonton kamera depan. Panel berhenti pada margin video dan mengikuti keseluruhan pergerakan jari.
+2. Pilih **Transparent**: latar panel hilang, teks dan pemasa kekal dengan bayang. Rakaman 10.55 saat berjaya dieksport dan disimpan ke galeri. Bingkai MP4 pada saat 2 menunjukkan panel atas kiri tanpa latar serta pemasa 0:18.
+3. Pilih **Standard**, seret ke tengah kanan dan tukar ke kamera belakang. Rakaman 12.12 saat berjaya dieksport/disimpan; bingkai MP4 pada saat 2 menunjukkan panel gelap pada kedudukan yang dipilih, dengan pemasa 0:18.
+4. Hentikan proses aplikasi dan buka semula kamera. Tema Standard dan kedudukan tengah kanan dipulihkan.
+5. Semasa rakaman, pemilihan tema/reset/seretan dikunci. Pilihan setiap sesi disimpan dalam metadata dan dihantar kepada eksport Media3.
+6. Tiada exception AndroidRuntime semasa semakan.
+
+Ujian automatik turut mengesahkan koordinat dihadkan dalam julat, nilai rosak menggunakan fallback, seretan berbilang event sebelum satu frame tidak kehilangan jarak, reset paparan, fon besar pada skrin kecil, tetapan selepas membuka semula skrin, metadata eksport selepas retry, dan pembacaan metadata lama tanpa tetapan paparan.
+
+Kamera sintetik emulator digunakan, bukan kamera hos. Telefon fizikal belum diuji. Tema Transparent sengaja tidak mempunyai latar; kontras bergantung pada imej kamera. Tetapan diubah sebelum rakaman, bukan semasa rakaman.
+
+APK: `build/releases/pulse-v1.3.0.apk`
+
+SHA-256:
+
+```text
+2e79c857cfb35e83eb19c3dd37e6cc05522ad98266e46e7c613931fa9b2260e4
+```
+
+Bukti visual:
+
+- [Pratonton Transparent di atas](screenshots/camera-transparent-v1.3.png)
+- [Video Transparent yang dieksport](screenshots/video-transparent-v1.3.png)
+- [Pratonton Standard di tengah](screenshots/camera-standard-v1.3.png)
+- [Video Standard yang dieksport](screenshots/video-standard-v1.3.png)
+
+Rujukan pelaksanaan native: [Media3 StaticOverlaySettings](https://developer.android.com/reference/androidx/media3/effect/StaticOverlaySettings.Builder).
+
+---
+
+# Rekod terdahulu: 1.2.0+3
 
 Tarikh: 8 Oktober 2026
 

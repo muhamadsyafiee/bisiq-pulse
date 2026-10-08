@@ -4,6 +4,7 @@ import 'package:flutter/services.dart';
 
 abstract class VideoCapture {
   bool get ready;
+  double get portraitAspectRatio;
   bool get front;
   bool get canSwitch;
   Future<void> initialize({required bool microphone});
@@ -18,6 +19,9 @@ class DeviceVideoCapture implements VideoCapture {
   CameraController? _controller;
   List<CameraDescription> _cameras = [];
   CameraDescription? _selected;
+  @override
+  double get portraitAspectRatio =>
+      ready ? 1 / _controller!.value.aspectRatio : 9 / 16;
   @override
   bool get ready => _controller?.value.isInitialized ?? false;
   @override

@@ -1,3 +1,4 @@
+import '../models/camera_display_settings.dart';
 import 'dart:convert';
 import 'dart:io';
 
@@ -10,7 +11,11 @@ import '../models/workout_plan.dart';
 import '../models/workout_recording.dart';
 
 abstract class RecordingArchive {
-  Future<WorkoutRecording> keep(String source, WorkoutPlan plan);
+  Future<WorkoutRecording> keep(
+    String source,
+    WorkoutPlan plan, {
+    CameraDisplaySettings? display,
+  });
   Future<List<WorkoutRecording>> list();
   Future<WorkoutRecording> export(WorkoutRecording recording);
   Future<WorkoutRecording> saveToGallery(WorkoutRecording recording);
@@ -37,10 +42,15 @@ class DeviceRecordingArchive implements RecordingArchive {
   }
 
   @override
-  Future<WorkoutRecording> keep(String source, WorkoutPlan plan) async {
+  Future<WorkoutRecording> keep(
+    String source,
+    WorkoutPlan plan, {
+    CameraDisplaySettings? display,
+  }) async {
     final item = WorkoutRecording(
       id: const Uuid().v4(),
       plan: plan,
+      display: display,
       createdAt: DateTime.now(),
     );
     final raw = await _file(item.id, '-raw.mp4');
@@ -98,6 +108,7 @@ class DeviceRecordingArchive implements RecordingArchive {
       'source': raw.path,
       'output': temporary.path,
       'plan': item.plan.toJson(),
+      if (item.display != null) 'display': item.display!.toJson(),
     });
     await temporary.rename(output.path);
     final updated = item.copyWith(exported: true);
