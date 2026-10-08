@@ -7,6 +7,8 @@ import '../theme/app_theme.dart';
 import 'template_picker_screen.dart';
 import 'workout_editor_screen.dart';
 import 'workout_screen.dart';
+import 'camera_workout_screen.dart';
+import 'recordings_screen.dart';
 
 class LibraryScreen extends StatefulWidget {
   const LibraryScreen({super.key, this.storage});
@@ -116,6 +118,17 @@ class _LibraryScreenState extends State<LibraryScreen> {
   @override
   Widget build(BuildContext context) => Scaffold(
     appBar: AppBar(
+      actions: [
+        IconButton(
+          tooltip: 'Rakaman Saya',
+          onPressed: () => Navigator.push<void>(
+            context,
+            MaterialPageRoute(builder: (_) => const RecordingsScreen()),
+          ),
+          icon: const Icon(Icons.video_library_outlined),
+        ),
+        const SizedBox(width: 12),
+      ],
       titleSpacing: 24,
       title: const Row(
         children: [
@@ -437,6 +450,15 @@ class _LibraryScreenState extends State<LibraryScreen> {
           ),
           icon: const Icon(Icons.play_arrow_rounded),
           label: const Text('BUKA PEMASA'),
+        ),
+        const SizedBox(height: 10),
+        FilledButton.icon(
+          onPressed: () => Navigator.push<void>(
+            context,
+            MaterialPageRoute(builder: (_) => CameraWorkoutScreen(plan: plan)),
+          ),
+          icon: const Icon(Icons.videocam_outlined),
+          label: const Text('RAKAM LATIHAN'),
         ),
       ],
     ),

@@ -42,6 +42,20 @@ adb install -r build/app/outputs/flutter-apk/app-release.apk
 
 Konfigurasi lalai menggunakan debug signing bagi APK release untuk pemasangan dan ujian tempatan. Sebelum edaran rasmi/Play Store, konfigurasi kunci release milik anda mengikut [panduan signing Flutter](https://docs.flutter.dev/deployment/android#sign-the-app). Jangan komit fail keystore atau kata laluan.
 
+## Rakaman kamera — versi 1.2.0
+
+1. Pilih rutin di **Latihan Saya**, kemudian tekan **RAKAM LATIHAN**.
+2. Benarkan akses kamera. Pilih kamera depan atau belakang menggunakan butang tukar kamera sebelum mula. Mikrofon dimatikan secara lalai; hidupkannya jika mahu merakam audio dan benarkan izin mikrofon.
+3. Tekan **MULA & RAKAM** untuk memulakan rakaman dan pemasa bersama. Paparan menunjukkan gerakan semasa, masa berbaki, rehat dan gerakan seterusnya.
+4. Rakaman berhenti secara automatik selepas gerakan terakhir, atau tekan **HENTI & SIMPAN** untuk menamatkan lebih awal.
+5. Aplikasi menyediakan video MP4 dengan nama rutin, gerakan dan pemasa yang tertera dalam video. Selepas siap, tekan **SIMPAN KE GALERI**. Rakaman terdahulu boleh dibuka melalui ikon **Rakaman Saya** pada halaman utama.
+
+Mod kamera ialah satu rakaman berterusan dalam orientasi potret; tiada jeda, langkau atau pertukaran kamera semasa merakam. Kawalan penuh tersebut kekal tersedia dalam **BUKA PEMASA**. Apabila aplikasi kehilangan fokus semasa merakam atau masuk ke latar belakang, rakaman dihentikan dan bahagian yang berjaya dirakam disimpan; rakaman tidak bermula semula dengan sendiri.
+
+Pemasa dalam video dilukis berdasarkan cap masa video menggunakan Android Media3 Transformer. Tunggu di halaman pemprosesan sehingga selesai. Rakaman asal disimpan dahulu, jadi eksport yang gagal boleh dicuba semula melalui **SEDIAKAN VIDEO**, termasuk selepas membuka semula aplikasi. Pemprosesan memerlukan ruang untuk rakaman asal dan video siap. Jika simpanan awal gagal, gunakan **CUBA SIMPAN SEMULA** sebelum meninggalkan halaman kamera.
+
+Video kekal pada peranti. Memadam salinan dalam aplikasi tidak memadam salinan galeri. Nyahpasang aplikasi membuang salinan dalam aplikasi; simpan video penting ke galeri dahulu. Izin storan hanya digunakan pada Android lama yang memerlukannya. Tiada kamera atau mikrofon diakses sehingga pengguna membuka mod kamera.
+
 ## Rutin peribadi — versi 1.1.0
 
 Pada penggunaan pertama, pengguna memilih **Guna template** atau **Cipta latihan sendiri**. Onboarding hanya selesai selepas rutin pertama berjaya disimpan; membatalkan editor akan kembali ke pilihan awal.
@@ -70,6 +84,8 @@ Pada penggunaan pertama, pengguna memilih **Guna template** atau **Cipta latihan
 
 ## Tingkah laku latar belakang
 
+Bahagian ini menerangkan mod pemasa biasa. Mod kamera menghentikan rakaman apabila terganggu seperti diterangkan di atas.
+
 Pemasa menggunakan masa berlalu (`Stopwatch`) dan tarikh tamat relatif, bukannya menolak satu saat bagi setiap callback. Apabila aplikasi kembali ke hadapan, semua interval yang telah berlalu diselaraskan sekali gus tanpa memainkan beep lama berulang kali. Sesi dijeda kekal dijeda.
 
 Aplikasi ini **tidak menggunakan Android foreground service**. Bunyi dimainkan ketika aplikasi di hadapan sahaja; proses tidak dijamin kekal hidup ketika Android menggantung atau menamatkannya. Sesi tidak dipulihkan selepas proses ditamatkan. `wakelock_plus` ialah kunci skrin, bukan perkhidmatan latar belakang atau CPU wakelock ([dokumentasi pakej](https://pub.dev/packages/wakelock_plus)).
@@ -80,12 +96,18 @@ Aplikasi ini **tidak menggunakan Android foreground service**. Bunyi dimainkan k
 lib/
   main.dart                       # Tema dan titik mula aplikasi
   data/workout_presets.dart       # Katalog tiga template
+  models/workout_recording.dart   # Metadata rakaman dan status eksport
   models/exercise.dart            # Gerakan dan serialisasi JSON
   models/workout_plan.dart        # Rutin tersimpan dengan ID unik
   screens/library_screen.dart     # Onboarding dan Latihan Saya
   screens/template_picker_screen.dart # Pilihan template
   screens/workout_editor_screen.dart # Editor rutin dan gerakan
+  screens/camera_workout_screen.dart # Kamera dan pemasa langsung
+  screens/recordings_screen.dart  # Eksport, simpan galeri dan padam salinan
   screens/workout_screen.dart     # UI pemasa, lifecycle dan kawalan
+  services/video_capture.dart    # Kamera depan/belakang dan rakaman
+  services/camera_workout_session.dart # Urutan rakaman dan lifecycle
+  services/recording_archive.dart # Arkib video tempatan dan eksport native
   services/workout_controller.dart # Mesin keadaan dan pengiraan masa
   services/workout_feedback.dart  # audioplayers dan wakelock_plus
   services/workout_library.dart   # Penyimpanan tempatan dan pengurusan rutin
@@ -109,7 +131,9 @@ Ujian meliputi urutan workout/rest/finished, kira detik 3–2–1, pause/resume 
 
 Bunyi WAV dijana sendiri melalui `python3 scripts/generate_audio.py` dan boleh digunakan bersama projek ini. Pakej dikunci melalui `pubspec.lock`.
 
-Binaan ini telah lulus 26 ujian dan analisis statik, serta berjaya dipasang dan diuji pada emulator Android API 36. Lihat [rekod pengesahan](docs/VERIFICATION.md) dan [tangkapan skrin Latihan Saya](docs/screenshots/library.png).
+Binaan ini telah lulus 37 ujian dan analisis statik, serta berjaya dipasang dan diuji pada emulator Android API 36. Lihat [rekod pengesahan](docs/VERIFICATION.md) dan [tangkapan skrin Latihan Saya](docs/screenshots/library.png).
+
+Ujian kamera turut meliputi izin ditolak, kegagalan mula/simpan, retry, operasi serentak, penamat automatik, gangguan ketika mula, eksport gagal tanpa kehilangan video asal dan skrin kecil dengan fon besar. Rakaman dan eksport diuji menggunakan kamera sintetik emulator; kamera dan mikrofon telefon fizikal masih perlu diuji.
 
 Ujian versi 1.1 turut meliputi onboarding kedua-dua laluan, import template, banyak rutin, edit/padam, susunan gerakan, validasi masa, pemulihan simpanan selepas restart, pembatalan editor, kegagalan simpan dan data rosak.
 

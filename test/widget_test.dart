@@ -9,6 +9,7 @@ import 'package:gym_timer/theme/app_theme.dart';
 class FakeFeedback implements WorkoutFeedback {
   final cues = <WorkoutCue>[];
   bool awake = false;
+  int disposeCalls = 0;
   @override
   Future<void> play(WorkoutCue cue) async {
     cues.add(cue);
@@ -23,6 +24,7 @@ class FakeFeedback implements WorkoutFeedback {
   Future<void> stop() async {}
   @override
   Future<void> dispose() async {
+    disposeCalls++;
     awake = false;
   }
 }
