@@ -1,3 +1,5 @@
+import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:gym_timer/l10n/app_strings.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:gym_timer/models/exercise.dart';
@@ -94,8 +96,8 @@ void main() {
     await tester.ensureVisible(find.text('LANGKAU'));
     await tester.tap(find.text('LANGKAU'));
     await tester.pumpAndSettle();
-    expect(find.text('Workout Finished'), findsOneWidget);
-    expect(find.textContaining('1 gerakan dilangkau'), findsOneWidget);
+    expect(find.text('Latihan Selesai'), findsOneWidget);
+    expect(find.textContaining('Gerakan dilangkau: 1'), findsOneWidget);
     expect(feedback.awake, false);
     await tester.tap(
       find.descendant(
@@ -108,26 +110,40 @@ void main() {
     expect(tester.takeException(), isNull);
   });
 
-  testWidgets('narrow screens and enlarged text do not overflow', (
-    tester,
-  ) async {
-    tester.view.physicalSize = const Size(320, 640);
-    tester.view.devicePixelRatio = 1;
-    addTearDown(tester.view.resetPhysicalSize);
-    addTearDown(tester.view.resetDevicePixelRatio);
-    await tester.pumpWidget(
-      MaterialApp(
-        theme: buildAppTheme(),
-        builder: (context, child) => MediaQuery(
-          data: MediaQuery.of(
-            context,
-          ).copyWith(textScaler: const TextScaler.linear(1.3)),
-          child: child!,
+  for (final code in AppStrings.languages.keys) {
+    testWidgets('$code narrow screens and enlarged text do not overflow', (
+      tester,
+    ) async {
+      tester.view.physicalSize = const Size(320, 640);
+      tester.view.devicePixelRatio = 1;
+      addTearDown(tester.view.resetPhysicalSize);
+      addTearDown(tester.view.resetDevicePixelRatio);
+      await tester.pumpWidget(
+        MaterialApp(
+          locale: Locale(code),
+          supportedLocales: AppStrings.languages.keys.map(Locale.new),
+          localizationsDelegates: const [
+            AppStrings.delegate,
+            ...GlobalMaterialLocalizations.delegates,
+          ],
+          theme: buildAppTheme(),
+          builder: (context, child) => MediaQuery(
+            data: MediaQuery.of(
+              context,
+            ).copyWith(textScaler: const TextScaler.linear(1.3)),
+            child: child!,
+          ),
+          home: WorkoutScreen(feedback: FakeFeedback()),
         ),
-        home: WorkoutScreen(feedback: FakeFeedback()),
-      ),
-    );
-    await tester.pump();
-    expect(tester.takeException(), isNull);
-  });
+      );
+      await tester.pumpAndSettle();
+      expect(tester.takeException(), isNull);
+      await tester.ensureVisible(find.byKey(const Key('primary-control')));
+      await tester.tap(find.text(AppStrings(code).text('startWorkout')));
+      await tester.pump();
+      expect(find.text(AppStrings(code).text('pause')), findsOneWidget);
+      expect(tester.takeException(), isNull);
+      await tester.pumpWidget(const SizedBox());
+    });
+  }
 }

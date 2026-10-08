@@ -1,5 +1,8 @@
 package com.pulseworkout.gym_timer
 
+import android.app.LocaleManager
+import android.os.Build
+import android.os.LocaleList
 import android.content.Intent
 import android.net.Uri
 import android.provider.Settings
@@ -30,6 +33,19 @@ class MainActivity : FlutterActivity() {
         super.configureFlutterEngine(flutterEngine)
         MethodChannel(flutterEngine.dartExecutor.binaryMessenger, "pulse/video").setMethodCallHandler { call, result ->
             when (call.method) {
+                "locale" -> {
+                    val code = call.argument<String>("code")
+                    if (code !in listOf("ms", "en", "id", "zh", "ta", "ar")) {
+                        result.error("LOCALE", "Unsupported locale", null)
+                    } else {
+                        if (Build.VERSION.SDK_INT >= 33) {
+                            val manager = getSystemService(LocaleManager::class.java)
+                            val locales = LocaleList.forLanguageTags(code)
+                            if (manager.applicationLocales != locales) manager.applicationLocales = locales
+                        }
+                        result.success(null)
+                    }
+                }
                 "settings" -> {
                     startActivity(Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS, Uri.parse("package:$packageName")))
                     result.success(null)
@@ -44,7 +60,7 @@ class MainActivity : FlutterActivity() {
                             val plan = requireNotNull(call.argument<Map<String, Any?>>("plan"))
                             require(File(source).isFile && source != output.path)
                             require(!output.exists())
-                            val overlay = WorkoutVideoOverlay(plan, call.argument<Map<String, Any?>>("display"))
+                            val overlay = WorkoutVideoOverlay(plan, call.argument<Map<String, Any?>>("display"), requireNotNull(call.argument<Map<String, String>>("labels")), call.argument<String>("languageCode") ?: "ms")
                             val item = EditedMediaItem.Builder(MediaItem.fromUri(Uri.fromFile(File(source))))
                                 .setEffects(Effects(emptyList(), listOf(OverlayEffect(ImmutableList.of<TextureOverlay>(overlay)))))
                                 .build()

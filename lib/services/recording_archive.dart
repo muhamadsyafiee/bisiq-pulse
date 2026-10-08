@@ -1,3 +1,4 @@
+import '../l10n/app_strings.dart';
 import '../models/camera_display_settings.dart';
 import 'dart:convert';
 import 'dart:io';
@@ -15,6 +16,7 @@ abstract class RecordingArchive {
     String source,
     WorkoutPlan plan, {
     CameraDisplaySettings? display,
+    String languageCode = 'ms',
   });
   Future<List<WorkoutRecording>> list();
   Future<WorkoutRecording> export(WorkoutRecording recording);
@@ -46,11 +48,13 @@ class DeviceRecordingArchive implements RecordingArchive {
     String source,
     WorkoutPlan plan, {
     CameraDisplaySettings? display,
+    String languageCode = 'ms',
   }) async {
     final item = WorkoutRecording(
       id: const Uuid().v4(),
       plan: plan,
       display: display,
+      languageCode: languageCode,
       createdAt: DateTime.now(),
     );
     final raw = await _file(item.id, '-raw.mp4');
@@ -107,7 +111,21 @@ class DeviceRecordingArchive implements RecordingArchive {
     await channel.invokeMethod<void>('export', {
       'source': raw.path,
       'output': temporary.path,
-      'plan': item.plan.toJson(),
+      'plan': item.plan.localized(AppStrings(item.languageCode)).toJson(),
+      'languageCode': item.languageCode,
+      'labels': {
+        for (final key in [
+          'finishedTitle',
+          'finished',
+          'rest',
+          'workout',
+          'breathe',
+          'seconds',
+          'exerciseProgress',
+          'nextExercise',
+        ])
+          key: AppStrings(item.languageCode).text(key),
+      },
       if (item.display != null) 'display': item.display!.toJson(),
     });
     await temporary.rename(output.path);

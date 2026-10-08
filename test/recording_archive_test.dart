@@ -1,3 +1,5 @@
+import 'package:gym_timer/data/workout_presets.dart';
+import 'package:gym_timer/l10n/app_strings.dart';
 import 'package:gym_timer/models/camera_display_settings.dart';
 import 'dart:io';
 
@@ -107,6 +109,45 @@ void main() {
       );
       await archive.delete(exported);
       expect(await archive.list(), isEmpty);
+    },
+  );
+  test(
+    'recorded language persists and native export translates template labels',
+    () async {
+      final item = await archive.keep(
+        await source(),
+        WorkoutPlan(
+          id: 'translated',
+          name: 'Upper Body',
+          nameKey: 'upperBody',
+          exercises: defaultExercises,
+        ),
+        languageCode: 'ar',
+      );
+      final restored = (await archive.list()).single;
+      expect(restored.languageCode, 'ar');
+      TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
+          .setMockMethodCallHandler(DeviceRecordingArchive.channel, (
+            call,
+          ) async {
+            final args = call.arguments as Map;
+            final strings = AppStrings(restored.languageCode);
+            expect(args['languageCode'], 'ar');
+            expect((args['plan'] as Map)['name'], strings.text('upperBody'));
+            expect(
+              ((args['plan'] as Map)['exercises'] as List).first['name'],
+              strings.text('pushup'),
+            );
+            expect((args['labels'] as Map)['rest'], strings.text('rest'));
+            expect(
+              (args['labels'] as Map)['exerciseProgress'],
+              strings.text('exerciseProgress'),
+            );
+            await File(args['source'] as String).copy(args['output'] as String);
+            return null;
+          });
+      expect((await archive.export(restored)).languageCode, item.languageCode);
+      expect((await archive.list()).single.languageCode, 'ar');
     },
   );
   test(

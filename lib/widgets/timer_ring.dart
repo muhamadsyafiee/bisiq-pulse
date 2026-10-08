@@ -1,3 +1,4 @@
+import '../l10n/app_strings.dart';
 import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
@@ -24,7 +25,9 @@ class TimerRing extends StatelessWidget {
         ? '${seconds ~/ 60}:${(seconds % 60).toString().padLeft(2, '0')}'
         : seconds.toString().padLeft(2, '0');
     return Semantics(
-      label: '$label, $seconds saat berbaki',
+      label: AppStrings.of(
+        context,
+      ).text('remaining', {'label': label, 'seconds': seconds}),
       child: ExcludeSemantics(
         child: SizedBox.square(
           dimension: 260,
@@ -42,14 +45,14 @@ class TimerRing extends StatelessWidget {
                     fontWeight: FontWeight.w800,
                   ),
                 ),
-                const SizedBox(height: 2),
+                SizedBox(height: 2),
                 Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 34),
+                  padding: EdgeInsets.symmetric(horizontal: 34),
                   child: FittedBox(
                     fit: BoxFit.scaleDown,
                     child: Text(
                       time,
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontSize: 84,
                         fontWeight: FontWeight.w800,
                         height: 1.2,
@@ -59,9 +62,9 @@ class TimerRing extends StatelessWidget {
                     ),
                   ),
                 ),
-                const SizedBox(height: 4),
-                const Text(
-                  'SAAT',
+                SizedBox(height: 4),
+                Text(
+                  AppStrings.of(context).text('seconds'),
                   style: TextStyle(
                     color: AppColors.muted,
                     fontSize: 11,

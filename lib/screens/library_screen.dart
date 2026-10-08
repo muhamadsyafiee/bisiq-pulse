@@ -1,3 +1,5 @@
+import 'settings_screen.dart';
+import '../l10n/app_strings.dart';
 import 'package:flutter/material.dart';
 
 import '../data/workout_presets.dart';
@@ -52,7 +54,7 @@ class _LibraryScreenState extends State<LibraryScreen> {
       if (fromTemplate) {
         template = await Navigator.push<WorkoutTemplate>(
           context,
-          MaterialPageRoute(builder: (_) => const TemplatePickerScreen()),
+          MaterialPageRoute(builder: (_) => TemplatePickerScreen()),
         );
         if (template == null || !mounted) return;
       }
@@ -62,9 +64,12 @@ class _LibraryScreenState extends State<LibraryScreen> {
         MaterialPageRoute(
           builder: (_) => WorkoutEditorScreen(
             library: _library,
-            plan: plan,
-            initialName: template?.name ?? '',
-            initialExercises: template?.exercises ?? const [],
+            plan: plan?.localized(AppStrings.of(context)),
+            initialName: template?.localized(AppStrings.of(context)).name ?? '',
+            initialNameKey: template?.nameKey,
+            initialExercises:
+                template?.localized(AppStrings.of(context)).exercises ??
+                const [],
           ),
         ),
       );
@@ -80,16 +85,20 @@ class _LibraryScreenState extends State<LibraryScreen> {
       final confirmed = await showDialog<bool>(
         context: context,
         builder: (context) => AlertDialog(
-          title: const Text('Padam latihan?'),
-          content: Text('“${plan.name}” akan dipadam daripada Latihan Saya.'),
+          title: Text(AppStrings.of(context).text('workoutDeleteTitle')),
+          content: Text(
+            AppStrings.of(context).text('workoutDeleteBody', {
+              'name': plan.displayName(AppStrings.of(context)),
+            }),
+          ),
           actions: [
             TextButton(
               onPressed: () => Navigator.pop(context, false),
-              child: const Text('BATAL'),
+              child: Text(AppStrings.of(context).text('cancel')),
             ),
             TextButton(
               onPressed: () => Navigator.pop(context, true),
-              child: const Text('PADAM'),
+              child: Text(AppStrings.of(context).text('delete')),
             ),
           ],
         ),
@@ -99,8 +108,8 @@ class _LibraryScreenState extends State<LibraryScreen> {
     } catch (_) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Latihan tidak dapat dipadam. Cuba lagi.'),
+          SnackBar(
+            content: Text(AppStrings.of(context).text('workoutDeleteError')),
           ),
         );
       }
@@ -120,17 +129,26 @@ class _LibraryScreenState extends State<LibraryScreen> {
     appBar: AppBar(
       actions: [
         IconButton(
-          tooltip: 'Rakaman Saya',
+          tooltip: AppStrings.of(context).text('settings'),
+          icon: Icon(Icons.settings_outlined),
           onPressed: () => Navigator.push<void>(
             context,
-            MaterialPageRoute(builder: (_) => const RecordingsScreen()),
+            MaterialPageRoute(builder: (_) => const SettingsScreen()),
           ),
-          icon: const Icon(Icons.video_library_outlined),
         ),
-        const SizedBox(width: 12),
+
+        IconButton(
+          tooltip: AppStrings.of(context).text('myRecordings'),
+          onPressed: () => Navigator.push<void>(
+            context,
+            MaterialPageRoute(builder: (_) => RecordingsScreen()),
+          ),
+          icon: Icon(Icons.video_library_outlined),
+        ),
+        SizedBox(width: 12),
       ],
       titleSpacing: 24,
-      title: const Row(
+      title: Row(
         children: [
           Icon(Icons.bolt_rounded, color: AppColors.green, size: 29),
           SizedBox(width: 4),
@@ -147,38 +165,38 @@ class _LibraryScreenState extends State<LibraryScreen> {
     ),
     body: SafeArea(
       child: _loading
-          ? const Center(child: CircularProgressIndicator())
+          ? Center(child: CircularProgressIndicator())
           : _loadFailed
           ? Center(
               child: Padding(
-                padding: const EdgeInsets.all(24),
+                padding: EdgeInsets.all(24),
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    const Icon(
+                    Icon(
                       Icons.cloud_off_rounded,
                       color: AppColors.orange,
                       size: 40,
                     ),
-                    const SizedBox(height: 16),
-                    const Text(
-                      'Latihan tidak dapat dimuatkan.',
+                    SizedBox(height: 16),
+                    Text(
+                      AppStrings.of(context).text('workoutLoadError'),
                       textAlign: TextAlign.center,
                       style: TextStyle(
                         fontSize: 22,
                         fontWeight: FontWeight.w700,
                       ),
                     ),
-                    const SizedBox(height: 8),
-                    const Text(
-                      'Data sedia ada tidak diubah. Cuba muatkan semula.',
+                    SizedBox(height: 8),
+                    Text(
+                      AppStrings.of(context).text('dataUnchanged'),
                       textAlign: TextAlign.center,
                       style: TextStyle(color: AppColors.muted),
                     ),
-                    const SizedBox(height: 24),
+                    SizedBox(height: 24),
                     FilledButton(
                       onPressed: _load,
-                      child: const Text('CUBA LAGI'),
+                      child: Text(AppStrings.of(context).text('retry')),
                     ),
                   ],
                 ),
@@ -193,32 +211,43 @@ class _LibraryScreenState extends State<LibraryScreen> {
   );
 
   Widget _welcome() => SingleChildScrollView(
-    padding: const EdgeInsets.all(24),
+    padding: EdgeInsets.all(24),
     child: Center(
       child: ConstrainedBox(
-        constraints: const BoxConstraints(maxWidth: 560),
+        constraints: BoxConstraints(maxWidth: 560),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            const SizedBox(height: 30),
+            OutlinedButton.icon(
+              key: const Key('onboarding-language'),
+              onPressed: () => Navigator.push<void>(
+                context,
+                MaterialPageRoute(builder: (_) => const SettingsScreen()),
+              ),
+              icon: Icon(Icons.language),
+              label: Text(
+                '${AppStrings.of(context).text("language")}: ${AppStrings.languages[AppStrings.of(context).code]}',
+              ),
+            ),
+            SizedBox(height: 30),
             Align(
               alignment: Alignment.centerLeft,
               child: Container(
-                padding: const EdgeInsets.all(22),
+                padding: EdgeInsets.all(22),
                 decoration: BoxDecoration(
                   color: AppColors.green.withValues(alpha: .1),
                   borderRadius: BorderRadius.circular(26),
                 ),
-                child: const Icon(
+                child: Icon(
                   Icons.timer_outlined,
                   color: AppColors.green,
                   size: 60,
                 ),
               ),
             ),
-            const SizedBox(height: 30),
-            const Text(
-              'Bermula dengan\nrentak anda.',
+            SizedBox(height: 30),
+            Text(
+              AppStrings.of(context).text('welcomeTitle'),
               style: TextStyle(
                 fontSize: 38,
                 fontWeight: FontWeight.w800,
@@ -226,32 +255,32 @@ class _LibraryScreenState extends State<LibraryScreen> {
                 letterSpacing: -1,
               ),
             ),
-            const SizedBox(height: 16),
-            const Text(
-              'Selamat datang ke PULSE. Pilih template sedia ada atau bina latihan yang sesuai dengan anda.',
+            SizedBox(height: 16),
+            Text(
+              AppStrings.of(context).text('welcomeBody'),
               style: TextStyle(
                 color: AppColors.muted,
                 fontSize: 15,
                 height: 1.6,
               ),
             ),
-            const SizedBox(height: 30),
+            SizedBox(height: 30),
             _choice(
               icon: Icons.layers_outlined,
-              title: 'Guna template',
-              subtitle: 'Pilih rutin siap dan ubah mengikut keperluan.',
+              title: AppStrings.of(context).text('useTemplate'),
+              subtitle: AppStrings.of(context).text('templateSubtitle'),
               onTap: () => _edit(fromTemplate: true),
             ),
-            const SizedBox(height: 16),
+            SizedBox(height: 16),
             _choice(
               icon: Icons.edit_note_rounded,
-              title: 'Cipta latihan sendiri',
-              subtitle: 'Tentukan gerakan, masa senaman dan rehat anda.',
+              title: AppStrings.of(context).text('createOwn'),
+              subtitle: AppStrings.of(context).text('createOwnSubtitle'),
               onTap: () => _edit(),
             ),
-            const SizedBox(height: 26),
-            const Text(
-              'Simpan banyak rutin. Pilih satu setiap kali anda bersedia untuk bergerak.',
+            SizedBox(height: 26),
+            Text(
+              AppStrings.of(context).text('manyRoutines'),
               style: TextStyle(
                 color: AppColors.muted,
                 fontSize: 12,
@@ -276,27 +305,24 @@ class _LibraryScreenState extends State<LibraryScreen> {
       borderRadius: BorderRadius.circular(22),
       onTap: onTap,
       child: Padding(
-        padding: const EdgeInsets.all(22),
+        padding: EdgeInsets.all(22),
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Icon(icon, color: AppColors.green, size: 27),
-            const SizedBox(width: 16),
+            SizedBox(width: 16),
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
                     title,
-                    style: const TextStyle(
-                      fontSize: 19,
-                      fontWeight: FontWeight.w700,
-                    ),
+                    style: TextStyle(fontSize: 19, fontWeight: FontWeight.w700),
                   ),
-                  const SizedBox(height: 7),
+                  SizedBox(height: 7),
                   Text(
                     subtitle,
-                    style: const TextStyle(
+                    style: TextStyle(
                       color: AppColors.muted,
                       fontSize: 13,
                       height: 1.5,
@@ -305,12 +331,8 @@ class _LibraryScreenState extends State<LibraryScreen> {
                 ],
               ),
             ),
-            const SizedBox(width: 8),
-            const Icon(
-              Icons.arrow_forward_rounded,
-              size: 20,
-              color: AppColors.muted,
-            ),
+            SizedBox(width: 8),
+            Icon(Icons.arrow_forward_rounded, size: 20, color: AppColors.muted),
           ],
         ),
       ),
@@ -319,38 +341,40 @@ class _LibraryScreenState extends State<LibraryScreen> {
 
   Widget _libraryView() => Center(
     child: ConstrainedBox(
-      constraints: const BoxConstraints(maxWidth: 640),
+      constraints: BoxConstraints(maxWidth: 640),
       child: ListView(
-        padding: const EdgeInsets.all(24),
+        padding: EdgeInsets.all(24),
         children: [
-          const Text(
-            'Latihan Saya',
+          Text(
+            AppStrings.of(context).text('myWorkouts'),
             style: TextStyle(
               fontSize: 34,
               fontWeight: FontWeight.w800,
               letterSpacing: -1,
             ),
           ),
-          const SizedBox(height: 8),
+          SizedBox(height: 8),
           Text(
-            '${_library.plans.length} rutin disimpan • Sedia apabila anda bersedia.',
-            style: const TextStyle(color: AppColors.muted, height: 1.5),
+            AppStrings.of(
+              context,
+            ).text('routinesSaved', {'count': _library.plans.length}),
+            style: TextStyle(color: AppColors.muted, height: 1.5),
           ),
-          const SizedBox(height: 24),
+          SizedBox(height: 24),
           FilledButton.icon(
             onPressed: () => _edit(),
-            icon: const Icon(Icons.add_rounded),
-            label: const Text('CIPTA LATIHAN'),
+            icon: Icon(Icons.add_rounded),
+            label: Text(AppStrings.of(context).text('createWorkoutButton')),
           ),
-          const SizedBox(height: 10),
+          SizedBox(height: 10),
           OutlinedButton.icon(
             onPressed: () => _edit(fromTemplate: true),
-            icon: const Icon(Icons.layers_outlined),
-            label: const Text('TAMBAH DARI TEMPLATE'),
+            icon: Icon(Icons.layers_outlined),
+            label: Text(AppStrings.of(context).text('addTemplate')),
           ),
-          const SizedBox(height: 28),
+          SizedBox(height: 28),
           if (_library.plans.isEmpty)
-            const Padding(
+            Padding(
               padding: EdgeInsets.symmetric(vertical: 32),
               child: Column(
                 children: [
@@ -361,12 +385,12 @@ class _LibraryScreenState extends State<LibraryScreen> {
                   ),
                   SizedBox(height: 20),
                   Text(
-                    'Belum ada latihan',
+                    AppStrings.of(context).text('noWorkouts'),
                     style: TextStyle(fontSize: 22, fontWeight: FontWeight.w700),
                   ),
                   SizedBox(height: 8),
                   Text(
-                    'Cipta rutin baharu atau pilih template untuk bermula.',
+                    AppStrings.of(context).text('noWorkoutsHint'),
                     textAlign: TextAlign.center,
                     style: TextStyle(color: AppColors.muted),
                   ),
@@ -381,8 +405,8 @@ class _LibraryScreenState extends State<LibraryScreen> {
 
   Widget _planCard(WorkoutPlan plan) => Container(
     key: Key('plan-${plan.id}'),
-    padding: const EdgeInsets.all(20),
-    margin: const EdgeInsets.only(bottom: 16),
+    padding: EdgeInsets.all(20),
+    margin: EdgeInsets.only(bottom: 16),
     decoration: BoxDecoration(
       color: AppColors.surface,
       border: Border.all(color: AppColors.border),
@@ -395,15 +419,14 @@ class _LibraryScreenState extends State<LibraryScreen> {
           children: [
             Expanded(
               child: Text(
-                plan.name,
-                style: const TextStyle(
-                  fontSize: 23,
-                  fontWeight: FontWeight.w700,
-                ),
+                plan.displayName(AppStrings.of(context)),
+                style: TextStyle(fontSize: 23, fontWeight: FontWeight.w700),
               ),
             ),
             PopupMenuButton<String>(
-              tooltip: 'Urus ${plan.name}',
+              tooltip: AppStrings.of(context).text('manageWorkout', {
+                'name': plan.displayName(AppStrings.of(context)),
+              }),
               onSelected: (action) {
                 if (action == 'edit') {
                   _edit(plan: plan);
@@ -412,53 +435,58 @@ class _LibraryScreenState extends State<LibraryScreen> {
                 }
               },
               itemBuilder: (_) => [
-                const PopupMenuItem(value: 'edit', child: Text('Edit latihan')),
-                const PopupMenuItem(
+                PopupMenuItem(
+                  value: 'edit',
+                  child: Text(AppStrings.of(context).text('editWorkout')),
+                ),
+                PopupMenuItem(
                   value: 'delete',
-                  child: Text('Padam latihan'),
+                  child: Text(AppStrings.of(context).text('deleteWorkout')),
                 ),
               ],
             ),
           ],
         ),
-        const SizedBox(height: 8),
+        SizedBox(height: 8),
         Text(
-          '${plan.exercises.length} gerakan • ${plan.totalSeconds ~/ 60}m ${plan.totalSeconds % 60}s',
-          style: const TextStyle(color: AppColors.green, fontSize: 13),
+          AppStrings.of(context).text('routineSummary', {
+            'count': plan.exercises.length,
+            'minutes': plan.totalSeconds ~/ 60,
+            'seconds': plan.totalSeconds % 60,
+          }),
+          style: TextStyle(color: AppColors.green, fontSize: 13),
         ),
-        const SizedBox(height: 12),
+        SizedBox(height: 12),
         Text(
-          plan.exercises.map((e) => e.name).join('  ·  '),
+          plan.exercises
+              .map((e) => e.displayName(AppStrings.of(context)))
+              .join('  ·  '),
           maxLines: 2,
           overflow: TextOverflow.ellipsis,
-          style: const TextStyle(
-            color: AppColors.muted,
-            height: 1.5,
-            fontSize: 13,
-          ),
+          style: TextStyle(color: AppColors.muted, height: 1.5, fontSize: 13),
         ),
-        const SizedBox(height: 20),
+        SizedBox(height: 20),
         OutlinedButton.icon(
           onPressed: () => Navigator.push<void>(
             context,
             MaterialPageRoute(
               builder: (_) => WorkoutScreen(
                 exercises: plan.exercises,
-                workoutName: plan.name,
+                workoutName: plan.displayName(AppStrings.of(context)),
               ),
             ),
           ),
-          icon: const Icon(Icons.play_arrow_rounded),
-          label: const Text('BUKA PEMASA'),
+          icon: Icon(Icons.play_arrow_rounded),
+          label: Text(AppStrings.of(context).text('openTimer')),
         ),
-        const SizedBox(height: 10),
+        SizedBox(height: 10),
         FilledButton.icon(
           onPressed: () => Navigator.push<void>(
             context,
             MaterialPageRoute(builder: (_) => CameraWorkoutScreen(plan: plan)),
           ),
-          icon: const Icon(Icons.videocam_outlined),
-          label: const Text('RAKAM LATIHAN'),
+          icon: Icon(Icons.videocam_outlined),
+          label: Text(AppStrings.of(context).text('recordWorkout')),
         ),
       ],
     ),

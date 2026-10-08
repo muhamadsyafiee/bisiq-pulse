@@ -1,5 +1,26 @@
 # Changelog
 
+## [1.4.0] — 2026-10-08
+
+### Ditambah
+
+- Enam pakej bahasa luar talian: Bahasa Malaysia, English, Bahasa Indonesia, Cina ringkas, Tamil dan Arab; Bahasa Malaysia menjadi lalai pada pemasangan pertama.
+- Pemilihan bahasa pada onboarding dan halaman Tetapan, dengan perubahan serta-merta dan simpanan untuk pelancaran seterusnya.
+- Terjemahan 187 mesej merangkumi semua skrin, dialog, validasi, ralat, aksesibiliti, template, pemasa dan paparan kamera.
+- Susun atur kanan ke kiri untuk Arab; eksport video menggunakan pembentukan tulisan native bagi skrip Arab/Tamil.
+- Bahasa disimpan bersama rakaman supaya eksport/retry kekal mengikut bahasa sesi asal.
+- Katalog JSON dan penjana yang mengesahkan kelengkapan kunci serta placeholder bagi setiap bahasa.
+
+### Keserasian dan pengesahan
+
+- Nama/nota pengguna kekal seperti ditaip. Medan template yang tidak disunting mengikuti bahasa pilihan; template lama yang sepadan sepenuhnya dikenal pasti secara automatik.
+- Video yang sudah siap tidak ditulis semula. Bahasa dialog sistem/galeri bergantung pada Android; penyelarasan bahasa sistem tersedia pada Android 13+.
+- 62 ujian lulus, termasuk keenam-enam bahasa pada onboarding, Tetapan selepas simpan rutin, kamera pada skrin kecil, pemulihan pilihan bahasa dan payload eksport video.
+- `flutter analyze` tiada isu; APK release dibina untuk versi `1.4.0+5`.
+- Pertukaran/pemulihan bahasa dan eksport video Arab/Tamil ke galeri disahkan pada emulator Android API 36.
+- APK menggunakan kunci debug tempatan yang sama untuk pemasangan/ujian. Pengesahan kamera menggunakan emulator sintetik; telefon fizikal belum diuji.
+
+
 ## [1.3.0] — 2026-10-08
 
 ### Ditambah

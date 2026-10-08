@@ -1,3 +1,4 @@
+import '../l10n/app_strings.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:uuid/uuid.dart';
@@ -13,11 +14,13 @@ class WorkoutEditorScreen extends StatefulWidget {
     required this.library,
     this.plan,
     this.initialName = '',
+    this.initialNameKey,
     this.initialExercises = const [],
   });
   final WorkoutLibrary library;
   final WorkoutPlan? plan;
   final String initialName;
+  final String? initialNameKey;
   final List<Exercise> initialExercises;
 
   @override
@@ -38,7 +41,7 @@ class _WorkoutEditorScreenState extends State<WorkoutEditorScreen> {
   @override
   void initState() {
     super.initState();
-    _id = widget.plan?.id ?? const Uuid().v4();
+    _id = widget.plan?.id ?? Uuid().v4();
     _name = TextEditingController(text: widget.plan?.name ?? widget.initialName)
       ..addListener(_changed);
     final exercises = widget.plan?.exercises ?? widget.initialExercises;
@@ -70,16 +73,16 @@ class _WorkoutEditorScreenState extends State<WorkoutEditorScreen> {
     final leave = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('Buang perubahan?'),
-        content: const Text('Perubahan latihan ini belum disimpan.'),
+        title: Text(AppStrings.of(context).text('discardTitle')),
+        content: Text(AppStrings.of(context).text('discardBody')),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context, false),
-            child: const Text('TERUS EDIT'),
+            child: Text(AppStrings.of(context).text('keepEditing')),
           ),
           TextButton(
             onPressed: () => Navigator.pop(context, true),
-            child: const Text('BUANG'),
+            child: Text(AppStrings.of(context).text('discard')),
           ),
         ],
       ),
@@ -94,7 +97,7 @@ class _WorkoutEditorScreenState extends State<WorkoutEditorScreen> {
     if (invalid.isNotEmpty) {
       await Scrollable.ensureVisible(
         invalid.first.context,
-        duration: const Duration(milliseconds: 250),
+        duration: Duration(milliseconds: 250),
       );
       return;
     }
@@ -102,6 +105,9 @@ class _WorkoutEditorScreenState extends State<WorkoutEditorScreen> {
     final plan = WorkoutPlan(
       id: _id,
       name: _name.text.trim(),
+      nameKey: _name.text.trim() == (widget.plan?.name ?? widget.initialName)
+          ? (widget.plan?.nameKey ?? widget.initialNameKey)
+          : null,
       exercises: _drafts
           .map(
             (d) => Exercise(
@@ -110,6 +116,13 @@ class _WorkoutEditorScreenState extends State<WorkoutEditorScreen> {
               restSeconds: int.parse(d.rest.text),
               description: d.description.text.trim(),
               assetPath: d.assetPath,
+              nameKey: d.name.text.trim() == d.original?.name
+                  ? d.original?.nameKey
+                  : null,
+              descriptionKey:
+                  d.description.text.trim() == d.original?.description
+                  ? d.original?.descriptionKey
+                  : null,
             ),
           )
           .toList(),
@@ -157,7 +170,11 @@ class _WorkoutEditorScreenState extends State<WorkoutEditorScreen> {
     },
     child: Scaffold(
       appBar: AppBar(
-        title: Text(widget.plan == null ? 'Cipta latihan' : 'Edit latihan'),
+        title: Text(
+          widget.plan == null
+              ? AppStrings.of(context).text('createWorkout')
+              : AppStrings.of(context).text('editWorkout'),
+        ),
         leading: BackButton(
           onPressed: _saving ? null : () => Navigator.maybePop(context),
         ),
@@ -168,68 +185,68 @@ class _WorkoutEditorScreenState extends State<WorkoutEditorScreen> {
           child: Form(
             key: _form,
             child: SingleChildScrollView(
-              padding: const EdgeInsets.all(24),
+              padding: EdgeInsets.all(24),
               child: Center(
                 child: ConstrainedBox(
-                  constraints: const BoxConstraints(maxWidth: 600),
+                  constraints: BoxConstraints(maxWidth: 600),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: [
-                      const Text(
-                        'Rutin anda.\nRentak anda.',
+                      Text(
+                        AppStrings.of(context).text('editorTitle'),
                         style: TextStyle(
                           fontSize: 32,
                           height: 1.1,
                           fontWeight: FontWeight.w800,
                         ),
                       ),
-                      const SizedBox(height: 12),
-                      const Text(
-                        'Susun gerakan dan tentukan masa untuk setiap satu. Semua tempoh dalam saat.',
+                      SizedBox(height: 12),
+                      Text(
+                        AppStrings.of(context).text('editorHint'),
                         style: TextStyle(color: AppColors.muted, height: 1.5),
                       ),
-                      const SizedBox(height: 24),
+                      SizedBox(height: 24),
                       TextFormField(
-                        key: const Key('routine-name'),
+                        key: Key('routine-name'),
                         controller: _name,
                         maxLength: 80,
                         textCapitalization: TextCapitalization.sentences,
-                        decoration: const InputDecoration(
-                          labelText: 'Nama latihan',
-                          hintText: 'Contoh: Latihan pagi',
+                        decoration: InputDecoration(
+                          labelText: AppStrings.of(context).text('routineName'),
+                          hintText: AppStrings.of(context).text('routineHint'),
                         ),
                         validator: (v) => v == null || v.trim().isEmpty
-                            ? 'Masukkan nama latihan'
+                            ? AppStrings.of(context).text('routineRequired')
                             : null,
                       ),
-                      const SizedBox(height: 12),
+                      SizedBox(height: 12),
                       ..._drafts.asMap().entries.map(
                         (entry) => _exerciseCard(entry.key, entry.value),
                       ),
                       OutlinedButton.icon(
-                        key: const Key('add-exercise'),
+                        key: Key('add-exercise'),
                         onPressed: () => setState(() {
                           _addDraft();
                           _dirty = true;
                         }),
-                        icon: const Icon(Icons.add_rounded),
-                        label: const Text('TAMBAH GERAKAN'),
+                        icon: Icon(Icons.add_rounded),
+                        label: Text(AppStrings.of(context).text('addExercise')),
                       ),
-                      const SizedBox(height: 16),
-                      const Text(
-                        'Rehat berlaku antara gerakan sahaja. Gerakan terakhir terus menamatkan sesi.',
+                      SizedBox(height: 16),
+                      Text(
+                        AppStrings.of(context).text('restHint'),
                         style: TextStyle(
                           color: AppColors.muted,
                           fontSize: 12,
                           height: 1.5,
                         ),
                       ),
-                      const SizedBox(height: 24),
+                      SizedBox(height: 24),
                       if (_saveFailed)
-                        const Padding(
+                        Padding(
                           padding: EdgeInsets.only(bottom: 16),
                           child: Text(
-                            'Latihan tidak dapat disimpan. Cuba lagi; perubahan anda masih ada.',
+                            AppStrings.of(context).text('workoutSaveError'),
                             style: TextStyle(
                               color: AppColors.orange,
                               height: 1.5,
@@ -237,17 +254,21 @@ class _WorkoutEditorScreenState extends State<WorkoutEditorScreen> {
                           ),
                         ),
                       FilledButton.icon(
-                        key: const Key('save-routine'),
+                        key: Key('save-routine'),
                         onPressed: _saving ? null : _save,
                         icon: _saving
-                            ? const SizedBox.square(
+                            ? SizedBox.square(
                                 dimension: 18,
                                 child: CircularProgressIndicator(
                                   strokeWidth: 2,
                                 ),
                               )
-                            : const Icon(Icons.check_rounded),
-                        label: Text(_saving ? 'MENYIMPAN…' : 'SIMPAN LATIHAN'),
+                            : Icon(Icons.check_rounded),
+                        label: Text(
+                          _saving
+                              ? AppStrings.of(context).text('saving')
+                              : AppStrings.of(context).text('saveWorkout'),
+                        ),
                       ),
                     ],
                   ),
@@ -262,8 +283,8 @@ class _WorkoutEditorScreenState extends State<WorkoutEditorScreen> {
 
   Widget _exerciseCard(int index, _ExerciseDraft draft) => Container(
     key: draft.key,
-    margin: const EdgeInsets.only(bottom: 16),
-    padding: const EdgeInsets.all(16),
+    margin: EdgeInsets.only(bottom: 16),
+    padding: EdgeInsets.all(16),
     decoration: BoxDecoration(
       color: AppColors.surface,
       border: Border.all(color: AppColors.border),
@@ -276,8 +297,10 @@ class _WorkoutEditorScreenState extends State<WorkoutEditorScreen> {
           children: [
             Expanded(
               child: Text(
-                'GERAKAN ${(index + 1).toString().padLeft(2, '0')}',
-                style: const TextStyle(
+                AppStrings.of(context).text('exerciseNumber', {
+                  'number': (index + 1).toString().padLeft(2, '0'),
+                }),
+                style: TextStyle(
                   color: AppColors.green,
                   letterSpacing: 1,
                   fontSize: 11,
@@ -286,19 +309,25 @@ class _WorkoutEditorScreenState extends State<WorkoutEditorScreen> {
               ),
             ),
             IconButton(
-              tooltip: 'Naikkan gerakan ${index + 1}',
+              tooltip: AppStrings.of(
+                context,
+              ).text('moveUpExercise', {'number': index + 1}),
               onPressed: index > 0 ? () => _move(index, -1) : null,
-              icon: const Icon(Icons.arrow_upward_rounded, size: 19),
+              icon: Icon(Icons.arrow_upward_rounded, size: 19),
             ),
             IconButton(
-              tooltip: 'Turunkan gerakan ${index + 1}',
+              tooltip: AppStrings.of(
+                context,
+              ).text('moveDownExercise', {'number': index + 1}),
               onPressed: index < _drafts.length - 1
                   ? () => _move(index, 1)
                   : null,
-              icon: const Icon(Icons.arrow_downward_rounded, size: 19),
+              icon: Icon(Icons.arrow_downward_rounded, size: 19),
             ),
             IconButton(
-              tooltip: 'Buang gerakan ${index + 1}',
+              tooltip: AppStrings.of(
+                context,
+              ).text('removeExercise', {'number': index + 1}),
               onPressed: _drafts.length > 1
                   ? () {
                       FocusScope.of(context).unfocus();
@@ -308,51 +337,57 @@ class _WorkoutEditorScreenState extends State<WorkoutEditorScreen> {
                       });
                     }
                   : null,
-              icon: const Icon(Icons.delete_outline_rounded, size: 19),
+              icon: Icon(Icons.delete_outline_rounded, size: 19),
             ),
           ],
         ),
-        const SizedBox(height: 8),
+        SizedBox(height: 8),
         TextFormField(
           key: Key('exercise-name-$index'),
           controller: draft.name,
           maxLength: 80,
           textCapitalization: TextCapitalization.sentences,
-          decoration: const InputDecoration(
-            labelText: 'Nama gerakan',
-            hintText: 'Contoh: Squat',
+          decoration: InputDecoration(
+            labelText: AppStrings.of(context).text('exerciseName'),
+            hintText: AppStrings.of(context).text('exerciseHint'),
           ),
-          validator: (v) =>
-              v == null || v.trim().isEmpty ? 'Masukkan nama gerakan' : null,
+          validator: (v) => v == null || v.trim().isEmpty
+              ? AppStrings.of(context).text('exerciseRequired')
+              : null,
         ),
-        const SizedBox(height: 8),
+        SizedBox(height: 8),
         Row(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Expanded(
               child: _durationField(
                 draft.work,
-                'Senaman (s)',
+                AppStrings.of(context).text('workSeconds'),
                 'work-$index',
                 1,
               ),
             ),
-            const SizedBox(width: 12),
+            SizedBox(width: 12),
             Expanded(
-              child: _durationField(draft.rest, 'Rehat (s)', 'rest-$index', 0),
+              child: _durationField(
+                draft.rest,
+                AppStrings.of(context).text('restSeconds'),
+                'rest-$index',
+                0,
+              ),
             ),
           ],
         ),
-        const SizedBox(height: 16),
+        SizedBox(height: 16),
         TextFormField(
           key: Key('exercise-notes-$index'),
           controller: draft.description,
           maxLength: 240,
           minLines: 1,
           maxLines: 3,
-          decoration: const InputDecoration(
-            labelText: 'Nota gerakan (pilihan)',
-            hintText: 'Contoh: Turun perlahan, badan tegak',
+          decoration: InputDecoration(
+            labelText: AppStrings.of(context).text('exerciseNotes'),
+            hintText: AppStrings.of(context).text('notesHint'),
           ),
         ),
       ],
@@ -374,12 +409,14 @@ class _WorkoutEditorScreenState extends State<WorkoutEditorScreen> {
     ],
     decoration: InputDecoration(
       labelText: label,
-      helperText: '$minimum–3600 saat',
+      helperText: AppStrings.of(
+        context,
+      ).text('secondsRange', {'minimum': minimum}),
     ),
     validator: (value) {
       final seconds = int.tryParse(value ?? '');
       return seconds == null || seconds < minimum || seconds > 3600
-          ? '$minimum–3600 saat'
+          ? AppStrings.of(context).text('secondsRange', {'minimum': minimum})
           : null;
     },
   );
@@ -387,11 +424,13 @@ class _WorkoutEditorScreenState extends State<WorkoutEditorScreen> {
 
 class _ExerciseDraft {
   _ExerciseDraft(Exercise? exercise)
-    : name = TextEditingController(text: exercise?.name ?? ''),
+    : original = exercise,
+      name = TextEditingController(text: exercise?.name ?? ''),
       work = TextEditingController(text: '${exercise?.workoutSeconds ?? 20}'),
       rest = TextEditingController(text: '${exercise?.restSeconds ?? 10}'),
       description = TextEditingController(text: exercise?.description ?? ''),
       assetPath = exercise?.assetPath;
+  final Exercise? original;
   final Key key = UniqueKey();
   final TextEditingController name, work, rest, description;
   final String? assetPath;

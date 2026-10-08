@@ -1,3 +1,4 @@
+import '../l10n/app_strings.dart';
 import 'dart:async';
 import 'dart:math' as math;
 import '../models/camera_display_settings.dart';
@@ -59,14 +60,12 @@ class _CameraWorkoutScreenState extends State<CameraWorkoutScreen>
 
   Future<void> _initialize() async {
     await _session.initialize();
-    CameraDisplaySettings settings = const CameraDisplaySettings();
+    CameraDisplaySettings settings = CameraDisplaySettings();
     try {
       settings = await _displayStore.load();
     } catch (_) {
       if (mounted) {
-        _notice(
-          'Tetapan paparan tidak dapat dibaca. Menggunakan tetapan asal.',
-        );
+        _notice(AppStrings.of(context).text('displayLoadError'));
       }
     }
     if (!mounted) return;
@@ -85,9 +84,7 @@ class _CameraWorkoutScreenState extends State<CameraWorkoutScreen>
       await _displayStore.save(_session.display);
     } catch (_) {
       if (mounted) {
-        _notice(
-          'Tetapan digunakan untuk sesi ini, tetapi belum disimpan. Cuba ubah tetapan semula.',
-        );
+        _notice(AppStrings.of(context).text('displaySaveError'));
       }
     }
   }
@@ -143,18 +140,16 @@ class _CameraWorkoutScreenState extends State<CameraWorkoutScreen>
       final stop = await showDialog<bool>(
         context: context,
         builder: (context) => AlertDialog(
-          title: const Text('Hentikan rakaman?'),
-          content: const Text(
-            'Video yang telah dirakam akan disimpan. Sesi latihan ini akan ditamatkan.',
-          ),
+          title: Text(AppStrings.of(context).text('stopRecordingTitle')),
+          content: Text(AppStrings.of(context).text('stopRecordingBody')),
           actions: [
             TextButton(
               onPressed: () => Navigator.pop(context, false),
-              child: const Text('TERUS RAKAM'),
+              child: Text(AppStrings.of(context).text('keepRecording')),
             ),
             TextButton(
               onPressed: () => Navigator.pop(context, true),
-              child: const Text('HENTI & SIMPAN'),
+              child: Text(AppStrings.of(context).text('stopSave')),
             ),
           ],
         ),
@@ -164,18 +159,16 @@ class _CameraWorkoutScreenState extends State<CameraWorkoutScreen>
       final leave = await showDialog<bool>(
         context: context,
         builder: (context) => AlertDialog(
-          title: const Text('Video belum disimpan'),
-          content: const Text(
-            'Cuba simpan semula dahulu. Keluar sekarang boleh menyebabkan rakaman ini hilang.',
-          ),
+          title: Text(AppStrings.of(context).text('unsavedVideo')),
+          content: Text(AppStrings.of(context).text('unsavedVideoBody')),
           actions: [
             TextButton(
               onPressed: () => Navigator.pop(context, false),
-              child: const Text('KEMBALI'),
+              child: Text(AppStrings.of(context).text('returnButton')),
             ),
             TextButton(
               onPressed: () => Navigator.pop(context, true),
-              child: const Text('KELUAR TANPA SIMPAN'),
+              child: Text(AppStrings.of(context).text('leaveUnsaved')),
             ),
           ],
         ),
@@ -212,41 +205,41 @@ class _CameraWorkoutScreenState extends State<CameraWorkoutScreen>
           child: LayoutBuilder(
             builder: (context, constraints) => SingleChildScrollView(
               child: Padding(
-                padding: const EdgeInsets.all(12),
+                padding: EdgeInsets.all(12),
                 child: Column(
                   children: [
                     Row(
                       children: [
                         IconButton(
-                          tooltip: 'Kembali',
+                          tooltip: AppStrings.of(context).text('back'),
                           onPressed: () => Navigator.maybePop(context),
-                          icon: const Icon(Icons.arrow_back_rounded),
+                          icon: Icon(Icons.arrow_back_rounded),
                         ),
                         Expanded(
                           child: Text(
-                            widget.plan.name,
+                            widget.plan.displayName(AppStrings.of(context)),
                             maxLines: 1,
                             overflow: TextOverflow.ellipsis,
-                            style: const TextStyle(
+                            style: TextStyle(
                               fontWeight: FontWeight.w700,
                               fontSize: 18,
                             ),
                           ),
                         ),
                         if (_session.isRecording)
-                          const Text(
-                            '● REC',
+                          Text(
+                            AppStrings.of(context).text('recordingIndicator'),
                             style: TextStyle(
                               color: Colors.redAccent,
                               fontWeight: FontWeight.bold,
                             ),
                           ),
                         IconButton(
-                          tooltip: 'Tukar kamera',
+                          tooltip: AppStrings.of(context).text('switchCamera'),
                           onPressed: editable && _session.capture.canSwitch
                               ? _session.switchCamera
                               : null,
-                          icon: const Icon(Icons.flip_camera_android_outlined),
+                          icon: Icon(Icons.flip_camera_android_outlined),
                         ),
                       ],
                     ),
@@ -255,12 +248,15 @@ class _CameraWorkoutScreenState extends State<CameraWorkoutScreen>
                         Expanded(
                           child: Text(
                             _session.capture.front
-                                ? 'Kamera depan'
-                                : 'Kamera belakang',
-                            style: const TextStyle(fontSize: 12),
+                                ? AppStrings.of(context).text('frontCamera')
+                                : AppStrings.of(context).text('backCamera'),
+                            style: TextStyle(fontSize: 12),
                           ),
                         ),
-                        const Text('Mikrofon', style: TextStyle(fontSize: 12)),
+                        Text(
+                          AppStrings.of(context).text('microphone'),
+                          style: TextStyle(fontSize: 12),
+                        ),
                         Switch(
                           value: _session.microphone,
                           onChanged:
@@ -276,9 +272,12 @@ class _CameraWorkoutScreenState extends State<CameraWorkoutScreen>
                       spacing: 8,
                       crossAxisAlignment: WrapCrossAlignment.center,
                       children: [
-                        const Text('Tema', style: TextStyle(fontSize: 12)),
+                        Text(
+                          AppStrings.of(context).text('theme'),
+                          style: TextStyle(fontSize: 12),
+                        ),
                         ChoiceChip(
-                          label: const Text('Standard'),
+                          label: Text(AppStrings.of(context).text('standard')),
                           selected: !_session.display.transparent,
                           onSelected: editable
                               ? (_) {
@@ -292,7 +291,9 @@ class _CameraWorkoutScreenState extends State<CameraWorkoutScreen>
                               : null,
                         ),
                         ChoiceChip(
-                          label: const Text('Transparent'),
+                          label: Text(
+                            AppStrings.of(context).text('transparent'),
+                          ),
                           selected: _session.display.transparent,
                           onSelected: editable
                               ? (_) {
@@ -306,28 +307,25 @@ class _CameraWorkoutScreenState extends State<CameraWorkoutScreen>
                               : null,
                         ),
                         IconButton(
-                          tooltip: 'Reset paparan',
+                          tooltip: AppStrings.of(context).text('resetDisplay'),
                           onPressed: editable
                               ? () {
-                                  _setDisplay(const CameraDisplaySettings());
+                                  _setDisplay(CameraDisplaySettings());
                                   unawaited(_saveDisplay());
                                 }
                               : null,
-                          icon: const Icon(Icons.restart_alt),
+                          icon: Icon(Icons.restart_alt),
                         ),
                       ],
                     ),
                     Padding(
-                      padding: const EdgeInsets.only(bottom: 8),
+                      padding: EdgeInsets.only(bottom: 8),
                       child: Text(
                         _session.isRecording
-                            ? 'Kedudukan dan tema dikunci semasa rakaman.'
-                            : 'Seret panel untuk ubah kedudukan sebelum mula.',
+                            ? AppStrings.of(context).text('displayLocked')
+                            : AppStrings.of(context).text('dragHint'),
                         textAlign: TextAlign.center,
-                        style: const TextStyle(
-                          fontSize: 11,
-                          color: Colors.white70,
-                        ),
+                        style: TextStyle(fontSize: 11, color: Colors.white70),
                       ),
                     ),
                     SizedBox(
@@ -359,17 +357,19 @@ class _CameraWorkoutScreenState extends State<CameraWorkoutScreen>
                     ),
                     if (_session.error != null)
                       Padding(
-                        padding: const EdgeInsets.all(12),
+                        padding: EdgeInsets.all(12),
                         child: Column(
                           children: [
                             Text(
-                              _session.error!,
-                              style: const TextStyle(color: AppColors.orange),
+                              AppStrings.of(context).text(_session.error!),
+                              style: TextStyle(color: AppColors.orange),
                             ),
                             if (_session.hasPendingVideo)
                               FilledButton(
                                 onPressed: _session.retrySave,
-                                child: const Text('CUBA SIMPAN SEMULA'),
+                                child: Text(
+                                  AppStrings.of(context).text('retrySave'),
+                                ),
                               )
                             else
                               Wrap(
@@ -377,26 +377,32 @@ class _CameraWorkoutScreenState extends State<CameraWorkoutScreen>
                                 children: [
                                   TextButton(
                                     onPressed: _session.initialize,
-                                    child: const Text('CUBA LAGI'),
+                                    child: Text(
+                                      AppStrings.of(context).text('retry'),
+                                    ),
                                   ),
                                   TextButton(
                                     onPressed: () => DeviceRecordingArchive
                                         .channel
                                         .invokeMethod<void>('settings'),
-                                    child: const Text('TETAPAN'),
+                                    child: Text(
+                                      AppStrings.of(
+                                        context,
+                                      ).text('systemSettings'),
+                                    ),
                                   ),
                                 ],
                               ),
                           ],
                         ),
                       ),
-                    const SizedBox(height: 12),
+                    SizedBox(height: 12),
                     if (_session.busy || !_displayLoaded) ...[
-                      const LinearProgressIndicator(),
+                      LinearProgressIndicator(),
                       Text(
                         _session.status == CaptureStatus.saving
-                            ? 'Menyimpan rakaman…'
-                            : 'Menyediakan kamera…',
+                            ? AppStrings.of(context).text('savingRecording')
+                            : AppStrings.of(context).text('preparingCamera'),
                       ),
                     ] else if (!_session.hasPendingVideo)
                       SizedBox(
@@ -405,7 +411,12 @@ class _CameraWorkoutScreenState extends State<CameraWorkoutScreen>
                           onPressed: _session.isRecording
                               ? _session.stop
                               : _session.status == CaptureStatus.ready
-                              ? _session.start
+                              ? () {
+                                  _session.setLanguage(
+                                    AppStrings.of(context).code,
+                                  );
+                                  unawaited(_session.start());
+                                }
                               : null,
                           style: FilledButton.styleFrom(
                             backgroundColor: _session.isRecording
@@ -419,21 +430,18 @@ class _CameraWorkoutScreenState extends State<CameraWorkoutScreen>
                           ),
                           label: Text(
                             _session.isRecording
-                                ? 'HENTI & SIMPAN'
-                                : 'MULA & RAKAM',
+                                ? AppStrings.of(context).text('stopSave')
+                                : AppStrings.of(context).text('startRecord'),
                           ),
                         ),
                       ),
-                    const SizedBox(height: 8),
+                    SizedBox(height: 8),
                     Text(
                       _session.isRecording
-                          ? 'Rakaman tamat selepas gerakan terakhir.'
-                          : 'Kedudukan dan tema ini turut digunakan dalam video.',
+                          ? AppStrings.of(context).text('recordEndHint')
+                          : AppStrings.of(context).text('displayVideoHint'),
                       textAlign: TextAlign.center,
-                      style: const TextStyle(
-                        color: Colors.white70,
-                        fontSize: 11,
-                      ),
+                      style: TextStyle(color: Colors.white70, fontSize: 11),
                     ),
                   ],
                 ),

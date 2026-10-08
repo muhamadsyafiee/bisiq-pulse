@@ -6,7 +6,7 @@
     <uses-feature android:name="android.hardware.camera.front" android:required="false" />
     <uses-feature android:name="android.hardware.microphone" android:required="false" />
     <application
-        android:label="PULSE Timer"
+        android:label="PULSE"
         android:name="${applicationName}"
         android:icon="@drawable/ic_pulse">
         <activity

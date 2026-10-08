@@ -1,3 +1,5 @@
+import 'package:flutter/services.dart';
+import 'language_test_support.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:gym_timer/main.dart';
@@ -21,15 +23,32 @@ Future<void> fill(WidgetTester tester, String key, String text) async {
 }
 
 void main() {
+  TestWidgetsFlutterBinding.ensureInitialized();
+  setUp(() {
+    TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
+        .setMockMethodCallHandler(
+          const MethodChannel('pulse/video'),
+          (call) async => null,
+        );
+  });
+  tearDown(() {
+    TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
+        .setMockMethodCallHandler(const MethodChannel('pulse/video'), null);
+  });
   testWidgets(
     'first-time template import is editable and persists on restart',
     (tester) async {
       final storage = MemoryLibraryStorage();
-      await tester.pumpWidget(WorkoutTimerApp(storage: storage));
+      await tester.pumpWidget(
+        WorkoutTimerApp(
+          storage: storage,
+          languageStorage: MemoryLanguageStorage(),
+        ),
+      );
       await tester.pumpAndSettle();
       expect(find.text('Bermula dengan\nrentak anda.'), findsOneWidget);
       await tapVisible(tester, find.text('Guna template'));
-      await tapVisible(tester, find.text('Upper Body'));
+      await tapVisible(tester, find.text('Bahagian Atas Badan'));
       await fill(tester, 'routine-name', 'Dada pagi');
       await fill(tester, 'work-0', '35');
       await tapVisible(tester, find.byKey(const Key('save-routine')));
@@ -40,7 +59,12 @@ void main() {
       await loaded.load();
       expect(loaded.plans.single.exercises.first.workoutSeconds, 35);
       await tester.pumpWidget(const SizedBox());
-      await tester.pumpWidget(WorkoutTimerApp(storage: storage));
+      await tester.pumpWidget(
+        WorkoutTimerApp(
+          storage: storage,
+          languageStorage: MemoryLanguageStorage(),
+        ),
+      );
       await tester.pumpAndSettle();
       expect(find.text('Latihan Saya'), findsOneWidget);
       expect(find.text('Guna template'), findsNothing);
@@ -54,7 +78,12 @@ void main() {
     'custom routine validates, reorders exercises, and saves many plans',
     (tester) async {
       final storage = MemoryLibraryStorage();
-      await tester.pumpWidget(WorkoutTimerApp(storage: storage));
+      await tester.pumpWidget(
+        WorkoutTimerApp(
+          storage: storage,
+          languageStorage: MemoryLanguageStorage(),
+        ),
+      );
       await tester.pumpAndSettle();
       await tapVisible(tester, find.text('Cipta latihan sendiri'));
       await tapVisible(tester, find.byKey(const Key('save-routine')));
@@ -98,7 +127,12 @@ void main() {
     addTearDown(library.dispose);
     await library.load();
     await library.save(plan('one'));
-    await tester.pumpWidget(WorkoutTimerApp(storage: storage));
+    await tester.pumpWidget(
+      WorkoutTimerApp(
+        storage: storage,
+        languageStorage: MemoryLanguageStorage(),
+      ),
+    );
     await tester.pumpAndSettle();
     await tapVisible(tester, find.byTooltip('Urus Morning'));
     await tapVisible(tester, find.text('Edit latihan'));
@@ -120,16 +154,21 @@ void main() {
     'cancelled setup remains first-run; unsaved edits ask before discard',
     (tester) async {
       final storage = MemoryLibraryStorage();
-      await tester.pumpWidget(WorkoutTimerApp(storage: storage));
+      await tester.pumpWidget(
+        WorkoutTimerApp(
+          storage: storage,
+          languageStorage: MemoryLanguageStorage(),
+        ),
+      );
       await tester.pumpAndSettle();
       await tapVisible(tester, find.text('Cipta latihan sendiri'));
       await fill(tester, 'routine-name', 'Unsaved');
-      await tester.pageBack();
+      await tester.tap(find.byType(BackButton));
       await tester.pumpAndSettle();
       expect(find.text('Buang perubahan?'), findsOneWidget);
       await tapVisible(tester, find.text('TERUS EDIT'));
       expect(find.text('Unsaved'), findsOneWidget);
-      await tester.pageBack();
+      await tester.tap(find.byType(BackButton));
       await tester.pumpAndSettle();
       await tapVisible(tester, find.text('BUANG'));
       expect(find.text('Cipta latihan sendiri'), findsOneWidget);
@@ -141,7 +180,12 @@ void main() {
     tester,
   ) async {
     final storage = MemoryLibraryStorage()..failWrite = true;
-    await tester.pumpWidget(WorkoutTimerApp(storage: storage));
+    await tester.pumpWidget(
+      WorkoutTimerApp(
+        storage: storage,
+        languageStorage: MemoryLanguageStorage(),
+      ),
+    );
     await tester.pumpAndSettle();
     await tapVisible(tester, find.text('Cipta latihan sendiri'));
     await fill(tester, 'routine-name', 'Keep me');
@@ -160,7 +204,12 @@ void main() {
     'corrupt storage shows retry without silently resetting user data',
     (tester) async {
       final storage = MemoryLibraryStorage()..document = 'invalid';
-      await tester.pumpWidget(WorkoutTimerApp(storage: storage));
+      await tester.pumpWidget(
+        WorkoutTimerApp(
+          storage: storage,
+          languageStorage: MemoryLanguageStorage(),
+        ),
+      );
       await tester.pumpAndSettle();
       expect(find.text('Latihan tidak dapat dimuatkan.'), findsOneWidget);
       expect(storage.document, 'invalid');

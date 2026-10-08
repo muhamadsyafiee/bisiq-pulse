@@ -1,3 +1,5 @@
+import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:gym_timer/l10n/app_strings.dart';
 import 'package:gym_timer/models/camera_display_settings.dart';
 import 'package:gym_timer/services/camera_display_store.dart';
 import 'package:flutter/material.dart';
@@ -22,63 +24,74 @@ class MemoryDisplayStore extends CameraDisplayStore {
 }
 
 void main() {
-  testWidgets(
-    'camera preview shows selected routine and controls on a small phone',
-    (tester) async {
-      tester.view.physicalSize = const Size(320, 640);
-      tester.view.devicePixelRatio = 1;
-      addTearDown(tester.view.resetPhysicalSize);
-      addTearDown(tester.view.resetDevicePixelRatio);
-      final plan = WorkoutPlan(
-        id: 'test',
-        name: 'Latihan pagi yang panjang',
-        exercises: const [
-          Exercise(
-            name: 'Mountain Climbers',
-            workoutSeconds: 45,
-            restSeconds: 10,
+  for (final code in AppStrings.languages.keys) {
+    final strings = AppStrings(code);
+    testWidgets(
+      '$code camera preview shows selected routine and controls on a small phone',
+      (tester) async {
+        tester.view.physicalSize = const Size(320, 640);
+        tester.view.devicePixelRatio = 1;
+        addTearDown(tester.view.resetPhysicalSize);
+        addTearDown(tester.view.resetDevicePixelRatio);
+        final plan = WorkoutPlan(
+          id: 'test',
+          name: 'Latihan pagi yang panjang',
+          exercises: const [
+            Exercise(
+              name: 'Mountain Climbers',
+              workoutSeconds: 45,
+              restSeconds: 10,
+            ),
+          ],
+        );
+        final session = CameraWorkoutSession(
+          plan: plan,
+          capture: FakeCapture(),
+          archive: FakeArchive(),
+          feedback: FakeFeedback(),
+          automaticTicks: false,
+        );
+        await tester.pumpWidget(
+          MaterialApp(
+            locale: Locale(code),
+            supportedLocales: AppStrings.languages.keys.map(
+              (code) => Locale(code),
+            ),
+            localizationsDelegates: const [
+              AppStrings.delegate,
+              ...GlobalMaterialLocalizations.delegates,
+            ],
+            theme: buildAppTheme(),
+            builder: (context, child) => MediaQuery(
+              data: MediaQuery.of(
+                context,
+              ).copyWith(textScaler: const TextScaler.linear(1.3)),
+              child: child!,
+            ),
+            home: CameraWorkoutScreen(
+              plan: plan,
+              session: session,
+              displayStore: MemoryDisplayStore(),
+            ),
           ),
-        ],
-      );
-      final session = CameraWorkoutSession(
-        plan: plan,
-        capture: FakeCapture(),
-        archive: FakeArchive(),
-        feedback: FakeFeedback(),
-        automaticTicks: false,
-      );
-      await tester.pumpWidget(
-        MaterialApp(
-          theme: buildAppTheme(),
-          builder: (context, child) => MediaQuery(
-            data: MediaQuery.of(
-              context,
-            ).copyWith(textScaler: const TextScaler.linear(1.3)),
-            child: child!,
-          ),
-          home: CameraWorkoutScreen(
-            plan: plan,
-            session: session,
-            displayStore: MemoryDisplayStore(),
-          ),
-        ),
-      );
-      await tester.pumpAndSettle();
-      expect(find.text('MULA & RAKAM'), findsOneWidget);
-      expect(find.text('0:45'), findsOneWidget);
-      expect(tester.takeException(), isNull);
-      await tester.tap(find.byTooltip('Tukar kamera'));
-      await tester.pumpAndSettle();
-      expect(find.text('Kamera belakang'), findsOneWidget);
-      await tester.ensureVisible(find.text('MULA & RAKAM'));
-      await tester.tap(find.text('MULA & RAKAM'));
-      await tester.pumpAndSettle();
-      expect(find.text('● REC'), findsOneWidget);
-      expect(find.text('HENTI & SIMPAN'), findsOneWidget);
-      expect(tester.takeException(), isNull);
-      await tester.pumpWidget(const SizedBox());
-    },
-  );
+        );
+        await tester.pumpAndSettle();
+        expect(find.text(strings.text('startRecord')), findsOneWidget);
+        expect(find.text('0:45'), findsOneWidget);
+        expect(tester.takeException(), isNull);
+        await tester.tap(find.byTooltip(strings.text('switchCamera')));
+        await tester.pumpAndSettle();
+        expect(find.text(strings.text('backCamera')), findsOneWidget);
+        await tester.ensureVisible(find.text(strings.text('startRecord')));
+        await tester.tap(find.text(strings.text('startRecord')));
+        await tester.pumpAndSettle();
+        expect(find.text(strings.text('recordingIndicator')), findsOneWidget);
+        expect(find.text(strings.text('stopSave')), findsOneWidget);
+        expect(tester.takeException(), isNull);
+        await tester.pumpWidget(const SizedBox());
+      },
+    );
+  }
   testWidgets(
     'drag clamps to video frame, theme persists and recording locks controls',
     (tester) async {
@@ -121,7 +134,7 @@ void main() {
       expect(tester.getTopLeft(panel).dy, lessThan(before.dy));
       expect(first.display.x, 0);
       expect(first.display.y, 0);
-      await tester.tap(find.text('Transparent'));
+      await tester.tap(find.text('Lutsinar'));
       await tester.pumpAndSettle();
       final surface = tester.widget<Container>(
         find.byKey(const Key('camera-panel-surface')),

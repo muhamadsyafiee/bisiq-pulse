@@ -1,3 +1,4 @@
+import '../data/workout_presets.dart';
 import 'dart:convert';
 
 import 'package:flutter/foundation.dart';
@@ -48,7 +49,11 @@ class WorkoutLibrary extends ChangeNotifier {
         throw const FormatException('Unsupported workout library');
       }
       final plans = (json['plans'] as List)
-          .map((p) => WorkoutPlan.fromJson(Map<String, dynamic>.from(p as Map)))
+          .map(
+            (p) => tagLegacyTemplate(
+              WorkoutPlan.fromJson(Map<String, dynamic>.from(p as Map)),
+            ),
+          )
           .toList();
       if (plans.map((p) => p.id).toSet().length != plans.length ||
           (plans.isNotEmpty && json['onboarded'] != true)) {

@@ -1,6 +1,6 @@
 # PULSE — Workout Timer
 
-Aplikasi Android Flutter untuk latihan interval, dengan antaramuka gelap dalam Bahasa Melayu. Semua bunyi tersedia secara luar talian; tiada akaun atau sambungan internet diperlukan.
+Aplikasi Android Flutter untuk latihan interval, dengan antaramuka gelap dan enam pilihan bahasa. Bahasa Malaysia ialah bahasa lalai. Semua bunyi tersedia secara luar talian; tiada akaun atau sambungan internet diperlukan.
 
 ## Jalankan
 
@@ -42,10 +42,30 @@ adb install -r build/app/outputs/flutter-apk/app-release.apk
 
 Konfigurasi lalai menggunakan debug signing bagi APK release untuk pemasangan dan ujian tempatan. Sebelum edaran rasmi/Play Store, konfigurasi kunci release milik anda mengikut [panduan signing Flutter](https://docs.flutter.dev/deployment/android#sign-the-app). Jangan komit fail keystore atau kata laluan.
 
+## Bahasa — versi 1.4.0
+
+- Enam pakej luar talian: **Bahasa Malaysia, English, Bahasa Indonesia, 中文 (Cina ringkas), தமிழ் (Tamil), العربية (Arab)**. Pemasangan pertama menggunakan Bahasa Malaysia tanpa mengikut bahasa telefon.
+- Pilih bahasa pada onboarding, atau melalui ikon **Tetapan → Bahasa** pada halaman utama. Perubahan digunakan terus dan disimpan selepas aplikasi ditutup.
+- Teks aplikasi, butang, dialog, validasi, mesej ralat, bantuan pembaca skrin, template, pemasa dan paparan kamera mengikuti pilihan bahasa. Arab menggunakan arah kanan ke kiri. Jenama PULSE dan nama asal bahasa kekal sama.
+- Nama serta nota yang pengguna taip sendiri dikekalkan. Medan template yang tidak diubah terus diterjemah apabila bahasa bertukar; medan yang telah disunting dianggap kandungan pengguna. Template lama yang masih sepadan sepenuhnya dinaik taraf tanpa mengubah rutin peribadi.
+- Bahasa rakaman disimpan semasa mula merakam. Eksport atau percubaan semula menggunakan bahasa sesi itu walaupun tetapan aplikasi kemudian ditukar. Video siap sedia ada tidak ditulis semula.
+- Pilihan ini meliputi enam bahasa di atas, bukan terjemahan automatik untuk setiap bahasa dunia. Semua terjemahan disertakan dalam APK; tiada teks dihantar ke perkhidmatan terjemahan.
+- Dialog milik Android/galeri bergantung pada sokongan sistem. Bahasa aplikasi diselaraskan ke Android 13+; pada Android lama, dialog sistem boleh mengikut bahasa telefon.
+
+Pakej terjemahan berada di `lib/l10n/<kod>.json` (187 mesej setiap bahasa). Selepas menyunting:
+
+```bash
+python3 scripts/generate_localizations.py
+dart format lib/l10n/messages.dart
+flutter test test/localization_test.dart
+```
+
+Penjana menolak kunci atau placeholder yang tidak lengkap. Untuk menambah bahasa, sediakan semua mesej dan daftar kodnya dalam `AppStrings.languages`, penjana, metadata rakaman serta senarai bahasa native Android; semak sokongan Flutter Material dan arah tulisan sebelum menerbitkan APK.
+
 ## Paparan kamera — versi 1.3.0
 
 - Di **RAKAM LATIHAN**, seret panel pemasa ke kedudukan yang dikehendaki dalam bingkai kamera sebelum menekan **MULA & RAKAM**. Panel kekal sepenuhnya di dalam video, dengan ruang kecil di tepi.
-- Pilih **Standard** untuk panel berlatar gelap atau **Transparent** untuk teks tanpa latar panel. Teks Transparent mempunyai bayang untuk membantu pembacaan.
+- Pilih **Standard** untuk panel berlatar gelap atau **Lutsinar** untuk teks tanpa latar panel. Teks Lutsinar mempunyai bayang untuk membantu pembacaan.
 - **Reset paparan** memulihkan kedudukan bawah tengah dan tema Standard. Kedudukan dan tema disimpan secara automatik untuk sesi seterusnya, termasuk selepas aplikasi dibuka semula.
 - Kedudukan dan tema dikunci semasa rakaman. Pilihan disimpan bersama setiap video, supaya eksport atau retry kemudian menggunakan tetapan sesi tersebut walaupun pilihan baharu telah dibuat.
 - Bingkai pratonton menggunakan nisbah kamera potret; kedudukan panel dikira relatif kepada video, bukan ruang butang atau skrin telefon. Video lama versi 1.2 mengekalkan susun atur lamanya.
@@ -87,7 +107,7 @@ Pada penggunaan pertama, pengguna memilih **Guna template** atau **Cipta latihan
 - **MULA LATIHAN**, **JEDA / SAMBUNG**, **SEMULA**, **LANGKAU**.
 - Langkau ketika senaman melangkau gerakan tersebut bersama rehatnya. Langkau ketika rehat terus ke gerakan seterusnya. Keadaan jeda dikekalkan.
 - Bunyi pendek pada 3, 2, 1; nada menaik ketika mula, nada menurun ketika rehat, melodi ketika tamat. Butang bunyi membolehkan mod senyap.
-- Dialog **Workout Finished** membezakan jumlah gerakan selesai dan dilangkau.
+- Dialog **Latihan Selesai** membezakan jumlah gerakan selesai dan dilangkau.
 - `wakelock_plus` mengekalkan skrin aktif hanya semasa pemasa berjalan di hadapan. Skrin dilepaskan semasa jeda, reset, tamat atau aplikasi berada di latar belakang.
 - Tiada gambar/GIF diperlukan untuk preset; medan `assetPath` tersedia untuk aset pilihan dan mempunyai fallback jika aset gagal dimuatkan.
 
@@ -103,7 +123,10 @@ Aplikasi ini **tidak menggunakan Android foreground service**. Bunyi dimainkan k
 
 ```text
 lib/
-  main.dart                       # Tema dan titik mula aplikasi
+  main.dart                       # Tema, locale dan titik mula aplikasi
+  l10n/                           # Enam JSON dan katalog mesej dijana
+  services/language_controller.dart # Pilihan bahasa tersimpan
+  screens/settings_screen.dart    # Pemilihan bahasa
   data/workout_presets.dart       # Katalog tiga template
   models/camera_display_settings.dart # Kedudukan relatif dan tema panel
   models/workout_recording.dart   # Metadata rakaman dan status eksport
@@ -144,7 +167,7 @@ Ujian meliputi urutan workout/rest/finished, kira detik 3–2–1, pause/resume 
 
 Bunyi WAV dijana sendiri melalui `python3 scripts/generate_audio.py` dan boleh digunakan bersama projek ini. Pakej dikunci melalui `pubspec.lock`.
 
-Binaan ini telah lulus 42 ujian dan analisis statik, serta berjaya dipasang dan diuji pada emulator Android API 36. Lihat [rekod pengesahan](docs/VERIFICATION.md) dan [tangkapan skrin Latihan Saya](docs/screenshots/library.png).
+Binaan ini telah lulus 62 ujian dan analisis statik, serta berjaya dipasang dan diuji pada emulator Android API 36. Lihat [rekod pengesahan](docs/VERIFICATION.md) dan [tangkapan skrin Latihan Saya](docs/screenshots/library.png).
 
 Ujian kamera turut meliputi izin ditolak, kegagalan mula/simpan, retry, operasi serentak, penamat automatik, gangguan ketika mula, eksport gagal tanpa kehilangan video asal dan skrin kecil dengan fon besar. Rakaman dan eksport diuji menggunakan kamera sintetik emulator; kamera dan mikrofon telefon fizikal masih perlu diuji.
 

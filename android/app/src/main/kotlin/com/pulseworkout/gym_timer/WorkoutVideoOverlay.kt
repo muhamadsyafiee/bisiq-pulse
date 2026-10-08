@@ -5,6 +5,12 @@ import android.graphics.Canvas
 import android.graphics.Color
 import android.graphics.Paint
 import android.graphics.Typeface
+import android.text.Layout
+import android.text.StaticLayout
+import android.text.TextDirectionHeuristics
+import android.text.TextPaint
+import android.text.TextUtils
+import java.util.Locale
 import androidx.media3.common.OverlaySettings
 import androidx.media3.common.util.Size
 import androidx.media3.common.util.UnstableApi
@@ -16,9 +22,11 @@ import kotlin.math.max
 /** Draws from video timestamps rather than wall time, so encoding speed does
  * not affect the workout countdown. Camera mode records one continuous take. */
 @UnstableApi
-class WorkoutVideoOverlay(plan: Map<String, Any?>, private val display: Map<String, Any?>? = null) : BitmapOverlay() {
+class WorkoutVideoOverlay(plan: Map<String, Any?>, private val display: Map<String, Any?>?, private val labels: Map<String, String>, private val languageCode: String) : BitmapOverlay() {
     private data class Exercise(val name: String, val work: Int, val rest: Int)
     private data class Frame(val index: Int, val rest: Boolean, val seconds: Int, val progress: Float, val finished: Boolean = false)
+    private val rtl = languageCode == "ar"
+    private fun label(key: String): String = requireNotNull(labels[key])
     private val title = plan["name"] as String
     private val exercises = (plan["exercises"] as List<*>).map {
         val item = it as Map<*, *>
@@ -84,28 +92,36 @@ class WorkoutVideoOverlay(plan: Map<String, Any?>, private val display: Map<Stri
             canvas.drawRoundRect(0f, 0f, w, h, w * .025f, w * .025f, paint)
         }
         fun text(value: String, x: Float, y: Float, size: Float, color: Int, maxWidth: Float) {
-            paint.color = color
-            paint.typeface = Typeface.create("sans-serif", Typeface.BOLD)
-            paint.textSize = size
-            var visible = value.replace('\n', ' ')
-            if (paint.measureText(visible) > maxWidth) {
-                while (visible.isNotEmpty() && paint.measureText("$visible…") > maxWidth) visible = visible.dropLast(1)
-                visible += "…"
+            val textPaint = TextPaint(Paint.ANTI_ALIAS_FLAG).apply {
+                this.color = color
+                typeface = Typeface.create("sans-serif", Typeface.BOLD)
+                textSize = size
+                textLocale = Locale.forLanguageTag(languageCode)
+                if (transparent) setShadowLayer(w * .01f, 0f, w * .0025f, Color.BLACK)
             }
-            if (transparent) paint.setShadowLayer(w * .01f, 0f, w * .0025f, Color.BLACK)
-            canvas.drawText(visible, x, y, paint)
-            paint.clearShadowLayer()
+            val layout = StaticLayout.Builder.obtain(value.replace('\n', ' '), 0, value.length, textPaint, maxWidth.toInt())
+                .setMaxLines(1).setEllipsize(TextUtils.TruncateAt.END)
+                .setIncludePad(false)
+                .setTextDirection(if (rtl) TextDirectionHeuristics.FIRSTSTRONG_RTL else TextDirectionHeuristics.FIRSTSTRONG_LTR)
+                .setAlignment(Layout.Alignment.ALIGN_NORMAL)
+                .build()
+            // ALIGN_NORMAL follows the paragraph direction. Explicit x positioning
+            // mirrors the panel columns while the native layout shapes complex scripts.
+            canvas.save()
+            canvas.translate(if (rtl) w - x - maxWidth else x, y - layout.getLineBaseline(0))
+            layout.draw(canvas)
+            canvas.restore()
         }
         val pad = w * .045f
         text("PULSE  •  $title", pad, w * .065f, w * .032f, Color.LTGRAY, w - pad * 2)
-        val phase = if (frame.finished) "SELESAI" else if (frame.rest) "REHAT" else "SENAMAN"
-        text("$phase  •  GERAKAN ${frame.index + 1}/${exercises.size}", pad, w * .125f, w * .030f, accent, w - pad * 2)
-        text(if (frame.finished) "Workout Finished" else if (frame.rest) "Tarik nafas seketika." else exercises[frame.index].name, pad, w * .20f, w * .055f, Color.WHITE, w - pad * 2)
+        val phase = if (frame.finished) label("finished") else if (frame.rest) label("rest") else label("workout")
+        text("$phase  •  ${label("exerciseProgress").replace("{current}", "${frame.index + 1}").replace("{total}", "${exercises.size}")}", pad, w * .125f, w * .030f, accent, w - pad * 2)
+        text(if (frame.finished) label("finishedTitle") else if (frame.rest) label("breathe") else exercises[frame.index].name, pad, w * .20f, w * .055f, Color.WHITE, w - pad * 2)
         val time = "${frame.seconds / 60}:${(frame.seconds % 60).toString().padStart(2, '0')}"
         text(time, pad, w * .34f, w * .125f, accent, w * .64f)
-        text("SAAT", w * .71f, w * .31f, w * .032f, Color.LTGRAY, w * .24f)
-        val next = exercises.getOrNull(frame.index + 1)?.name ?: "Selesai"
-        text("Seterusnya: $next", pad, w * .395f, w * .029f, Color.LTGRAY, w - pad * 2)
+        text(label("seconds"), w * .71f, w * .31f, w * .032f, Color.LTGRAY, w * .24f)
+        val next = exercises.getOrNull(frame.index + 1)?.name ?: label("finished")
+        text(label("nextExercise").replace("{name}", next), pad, w * .395f, w * .029f, Color.LTGRAY, w - pad * 2)
         paint.color = accent
         canvas.drawRect(pad, h - w * .013f, pad + (w - pad * 2) * frame.progress.coerceIn(0f, 1f), h - w * .008f, paint)
         return bitmap

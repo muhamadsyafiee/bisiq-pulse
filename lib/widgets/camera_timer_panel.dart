@@ -1,3 +1,4 @@
+import '../l10n/app_strings.dart';
 import 'package:flutter/material.dart';
 import '../models/camera_display_settings.dart';
 import '../models/workout_plan.dart';
@@ -30,7 +31,8 @@ class CameraTimerPanel extends StatelessWidget {
       double left = 18,
       double width = 364,
     }) => Positioned(
-      left: left,
+      left: AppStrings.of(context).rtl ? null : left,
+      right: AppStrings.of(context).rtl ? left : null,
       top: top,
       width: width,
       child: Text(
@@ -58,26 +60,31 @@ class CameraTimerPanel extends StatelessWidget {
     return FittedBox(
       fit: BoxFit.contain,
       child: Container(
-        key: const Key('camera-panel-surface'),
+        key: Key('camera-panel-surface'),
         width: 400,
         height: 172,
         decoration: BoxDecoration(
-          color: settings.transparent
-              ? Colors.transparent
-              : const Color(0xDA101412),
+          color: settings.transparent ? Colors.transparent : Color(0xDA101412),
           borderRadius: BorderRadius.circular(10),
         ),
         child: Stack(
           children: [
-            line('PULSE  •  ${plan.name}', 13, 13, Colors.white70),
             line(
-              '${recording ? (rest ? 'REHAT' : 'SENAMAN') : 'BERSEDIA'}  •  GERAKAN ${timer.index + 1}/${plan.exercises.length}',
+              'PULSE  •  ${plan.displayName(AppStrings.of(context))}',
+              13,
+              13,
+              Colors.white70,
+            ),
+            line(
+              '${recording ? (rest ? AppStrings.of(context).text('rest') : AppStrings.of(context).text('workout')) : AppStrings.of(context).text('ready')}  •  ${AppStrings.of(context).text('exerciseProgress', {'current': timer.index + 1, 'total': plan.exercises.length})}',
               38,
               12,
               color,
             ),
             line(
-              rest ? 'Tarik nafas seketika.' : timer.currentExercise.name,
+              rest
+                  ? AppStrings.of(context).text('breathe')
+                  : timer.currentExercise.displayName(AppStrings.of(context)),
               58,
               22,
               Colors.white,
@@ -89,9 +96,20 @@ class CameraTimerPanel extends StatelessWidget {
               color,
               width: 255,
             ),
-            line('SAAT', 112, 13, Colors.white70, left: 284, width: 96),
             line(
-              'Seterusnya: ${timer.nextExercise?.name ?? 'Selesai'}',
+              AppStrings.of(context).text('seconds'),
+              112,
+              13,
+              Colors.white70,
+              left: 284,
+              width: 96,
+            ),
+            line(
+              AppStrings.of(context).text('nextExercise', {
+                'name':
+                    timer.nextExercise?.displayName(AppStrings.of(context)) ??
+                    AppStrings.of(context).text('finished'),
+              }),
               146,
               12,
               Colors.white70,

@@ -66,12 +66,14 @@ class FakeArchive implements RecordingArchive {
     String source,
     WorkoutPlan plan, {
     CameraDisplaySettings? display,
+    String languageCode = 'ms',
   }) async {
     if (failKeep) throw StateError('disk full');
     final item = WorkoutRecording(
       id: 'recording',
       plan: plan,
       display: display,
+      languageCode: languageCode,
       createdAt: DateTime(2026),
     );
     items.add(item);

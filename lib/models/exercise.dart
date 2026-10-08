@@ -1,3 +1,5 @@
+import '../l10n/app_strings.dart';
+
 /// A workout interval. Rest follows this exercise, except at the end of a set.
 class Exercise {
   const Exercise({
@@ -6,10 +8,25 @@ class Exercise {
     required this.restSeconds,
     this.assetPath,
     this.description = '',
+    this.nameKey,
+    this.descriptionKey,
   }) : assert(workoutSeconds > 0),
        assert(restSeconds >= 0);
 
   final String name;
+  final String? nameKey, descriptionKey;
+  String displayName(AppStrings s) => nameKey == null ? name : s.text(nameKey!);
+  String displayDescription(AppStrings s) =>
+      descriptionKey == null ? description : s.text(descriptionKey!);
+  Exercise localized(AppStrings s) => Exercise(
+    name: displayName(s),
+    workoutSeconds: workoutSeconds,
+    restSeconds: restSeconds,
+    assetPath: assetPath,
+    description: displayDescription(s),
+    nameKey: nameKey,
+    descriptionKey: descriptionKey,
+  );
   final int workoutSeconds;
   final int restSeconds;
   final String? assetPath;
@@ -17,6 +34,8 @@ class Exercise {
 
   Map<String, Object?> toJson() => {
     'name': name,
+    if (nameKey != null) 'nameKey': nameKey,
+    if (descriptionKey != null) 'descriptionKey': descriptionKey,
     'workoutSeconds': workoutSeconds,
     'restSeconds': restSeconds,
     'assetPath': assetPath,
@@ -41,6 +60,8 @@ class Exercise {
     }
     return Exercise(
       name: name,
+      nameKey: json['nameKey'] as String?,
+      descriptionKey: json['descriptionKey'] as String?,
       workoutSeconds: workout,
       restSeconds: rest,
       description: description as String? ?? '',

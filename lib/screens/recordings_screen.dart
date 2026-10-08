@@ -1,3 +1,5 @@
+import 'package:intl/intl.dart';
+import '../l10n/app_strings.dart';
 import 'package:flutter/material.dart';
 import 'package:gal/gal.dart';
 import 'package:wakelock_plus/wakelock_plus.dart';
@@ -53,7 +55,7 @@ class _RecordingsScreenState extends State<RecordingsScreen> {
       if (mounted) {
         setState(() {
           _loading = false;
-          _error = 'Rakaman tidak dapat dimuatkan. Cuba lagi.';
+          _error = AppStrings.of(context).text('recordingsLoadError');
         });
       }
     }
@@ -79,8 +81,8 @@ class _RecordingsScreenState extends State<RecordingsScreen> {
       if (mounted) {
         setState(
           () => _error = gallery
-              ? 'Video belum disimpan ke galeri. Semak izin dan ruang telefon, kemudian cuba lagi. Salinan aplikasi masih ada.'
-              : 'Video belum dapat diproses. Rakaman asal masih disimpan; cuba “Sediakan video” semula.',
+              ? AppStrings.of(context).text('gallerySaveError')
+              : AppStrings.of(context).text('exportError'),
         );
       }
     } finally {
@@ -106,18 +108,16 @@ class _RecordingsScreenState extends State<RecordingsScreen> {
     final yes = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('Padam salinan aplikasi?'),
-        content: const Text(
-          'Rakaman ini akan dipadam daripada aplikasi. Salinan yang telah disimpan ke galeri tidak dipadam.',
-        ),
+        title: Text(AppStrings.of(context).text('deleteRecordingTitle')),
+        content: Text(AppStrings.of(context).text('deleteRecordingBody')),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context, false),
-            child: const Text('BATAL'),
+            child: Text(AppStrings.of(context).text('cancel')),
           ),
           TextButton(
             onPressed: () => Navigator.pop(context, true),
-            child: const Text('PADAM'),
+            child: Text(AppStrings.of(context).text('delete')),
           ),
         ],
       ),
@@ -129,7 +129,9 @@ class _RecordingsScreenState extends State<RecordingsScreen> {
       if (mounted) setState(() => _items.removeWhere((i) => i.id == item.id));
     } catch (_) {
       if (mounted) {
-        setState(() => _error = 'Rakaman tidak dapat dipadam. Cuba lagi.');
+        setState(
+          () => _error = AppStrings.of(context).text('recordingDeleteError'),
+        );
       }
     } finally {
       if (mounted) setState(() => _working = false);
@@ -141,10 +143,7 @@ class _RecordingsScreenState extends State<RecordingsScreen> {
       await Gal.open();
     } catch (_) {
       if (mounted) {
-        setState(
-          () => _error =
-              'Buka aplikasi Galeri pada telefon untuk melihat video anda.',
-        );
+        setState(() => _error = AppStrings.of(context).text('openGalleryHint'));
       }
     }
   }
@@ -154,70 +153,67 @@ class _RecordingsScreenState extends State<RecordingsScreen> {
     canPop: !_working,
     child: Scaffold(
       appBar: AppBar(
-        title: const Text('Rakaman Saya'),
+        title: Text(AppStrings.of(context).text('myRecordings')),
         actions: [
           IconButton(
-            tooltip: 'Buka galeri',
+            tooltip: AppStrings.of(context).text('openGallery'),
             onPressed: _working ? null : _openGallery,
-            icon: const Icon(Icons.photo_library_outlined),
+            icon: Icon(Icons.photo_library_outlined),
           ),
         ],
       ),
       body: SafeArea(
         child: _loading
-            ? const Center(child: CircularProgressIndicator())
+            ? Center(child: CircularProgressIndicator())
             : ListView(
-                padding: const EdgeInsets.all(24),
+                padding: EdgeInsets.all(24),
                 children: [
-                  const Text(
-                    'Usaha anda,\ndirakam.',
+                  Text(
+                    AppStrings.of(context).text('recordingsTitle'),
                     style: TextStyle(
                       fontSize: 32,
                       height: 1.1,
                       fontWeight: FontWeight.w800,
                     ),
                   ),
-                  const SizedBox(height: 16),
+                  SizedBox(height: 16),
                   Text(
                     widget.interrupted
-                        ? 'Rakaman dihentikan apabila aplikasi terganggu. Video yang berjaya dirakam disimpan di sini.'
-                        : 'Video disimpan dalam aplikasi. Sediakan video dengan pemasa, kemudian simpan ke galeri.',
-                    style: const TextStyle(color: AppColors.muted, height: 1.5),
+                        ? AppStrings.of(context).text('recordingInterrupted')
+                        : AppStrings.of(context).text('recordingsHint'),
+                    style: TextStyle(color: AppColors.muted, height: 1.5),
                   ),
-                  const SizedBox(height: 20),
+                  SizedBox(height: 20),
                   if (_error != null)
                     Padding(
-                      padding: const EdgeInsets.only(bottom: 20),
+                      padding: EdgeInsets.only(bottom: 20),
                       child: Text(
                         _error!,
-                        style: const TextStyle(
-                          color: AppColors.orange,
-                          height: 1.5,
-                        ),
+                        style: TextStyle(color: AppColors.orange, height: 1.5),
                       ),
                     ),
                   if (_items.isEmpty) ...[
-                    const SizedBox(height: 30),
-                    const Icon(
+                    SizedBox(height: 30),
+                    Icon(
                       Icons.video_library_outlined,
                       size: 60,
                       color: AppColors.muted,
                     ),
-                    const SizedBox(height: 16),
-                    const Text(
-                      'Belum ada rakaman',
+                    SizedBox(height: 16),
+                    Text(
+                      AppStrings.of(context).text('noRecordings'),
                       textAlign: TextAlign.center,
                     ),
                     if (_error != null)
                       TextButton(
                         onPressed: _load,
-                        child: const Text('CUBA LAGI'),
+                        child: Text(AppStrings.of(context).text('retry')),
                       ),
                   ],
                   ..._items.map(
                     (item) => Container(
-                      margin: const EdgeInsets.only(bottom: 16),
-                      padding: const EdgeInsets.all(20),
+                      margin: EdgeInsets.only(bottom: 16),
+                      padding: EdgeInsets.all(20),
                       decoration: BoxDecoration(
                         color: AppColors.surface,
                         borderRadius: BorderRadius.circular(20),
@@ -227,43 +223,45 @@ class _RecordingsScreenState extends State<RecordingsScreen> {
                         children: [
                           Row(
                             children: [
-                              const Icon(
+                              Icon(
                                 Icons.movie_outlined,
                                 color: AppColors.green,
                               ),
-                              const SizedBox(width: 12),
+                              SizedBox(width: 12),
                               Expanded(
                                 child: Text(
-                                  item.plan.name,
-                                  style: const TextStyle(
+                                  item.plan.displayName(AppStrings.of(context)),
+                                  style: TextStyle(
                                     fontWeight: FontWeight.w700,
                                     fontSize: 20,
                                   ),
                                 ),
                               ),
                               IconButton(
-                                tooltip: 'Padam rakaman',
+                                tooltip: AppStrings.of(
+                                  context,
+                                ).text('deleteRecording'),
                                 onPressed: _working
                                     ? null
                                     : () => _delete(item),
-                                icon: const Icon(Icons.delete_outline),
+                                icon: Icon(Icons.delete_outline),
                               ),
                             ],
                           ),
-                          const SizedBox(height: 8),
+                          SizedBox(height: 8),
                           Text(
-                            '${item.createdAt.toLocal().toString().substring(0, 16)} • ${item.exported ? 'Video dengan pemasa' : 'Rakaman asal disimpan'}',
-                            style: const TextStyle(
+                            '${DateFormat.yMd(AppStrings.of(context).code).add_Hm().format(item.createdAt.toLocal())} • ${item.exported ? AppStrings.of(context).text('videoReady') : AppStrings.of(context).text('rawSaved')}',
+                            style: TextStyle(
                               color: AppColors.muted,
                               fontSize: 12,
                             ),
                           ),
-                          const SizedBox(height: 20),
+                          SizedBox(height: 20),
                           if (_workingId == item.id) ...[
-                            const LinearProgressIndicator(),
-                            const SizedBox(height: 14),
-                            const Text(
-                              'Menyediakan video… Kekalkan aplikasi terbuka.',
+                            LinearProgressIndicator(),
+                            SizedBox(height: 14),
+                            Text(
+                              AppStrings.of(context).text('preparingVideo'),
                               style: TextStyle(color: AppColors.muted),
                             ),
                           ] else
@@ -281,10 +279,14 @@ class _RecordingsScreenState extends State<RecordingsScreen> {
                               ),
                               label: Text(
                                 item.gallerySaved
-                                    ? 'DISIMPAN KE GALERI'
+                                    ? AppStrings.of(
+                                        context,
+                                      ).text('savedGallery')
                                     : item.exported
-                                    ? 'SIMPAN KE GALERI'
-                                    : 'SEDIAKAN VIDEO',
+                                    ? AppStrings.of(context).text('saveGallery')
+                                    : AppStrings.of(
+                                        context,
+                                      ).text('prepareVideo'),
                               ),
                             ),
                         ],

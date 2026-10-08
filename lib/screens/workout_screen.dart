@@ -1,3 +1,4 @@
+import '../l10n/app_strings.dart';
 import 'dart:async';
 
 import 'package:flutter/material.dart';
@@ -15,11 +16,11 @@ class WorkoutScreen extends StatefulWidget {
     super.key,
     this.exercises = defaultExercises,
     this.feedback,
-    this.workoutName = 'Upper body.\nStronger you.',
+    this.workoutName,
   });
   final List<Exercise> exercises;
   final WorkoutFeedback? feedback;
-  final String workoutName;
+  final String? workoutName;
 
   @override
   State<WorkoutScreen> createState() => _WorkoutScreenState();
@@ -84,26 +85,26 @@ class _WorkoutScreenState extends State<WorkoutScreen>
   Future<void> _showFinished() => showDialog<void>(
     context: context,
     builder: (dialogContext) => AlertDialog(
-      icon: const Icon(
-        Icons.emoji_events_rounded,
-        color: AppColors.green,
-        size: 44,
-      ),
-      title: const Text('Workout Finished'),
+      icon: Icon(Icons.emoji_events_rounded, color: AppColors.green, size: 44),
+      title: Text(AppStrings.of(context).text('finishedTitle')),
       content: Text(
-        '${_controller.completedCount} daripada ${_controller.exercises.length} gerakan selesai.\n${_controller.skippedCount > 0 ? '${_controller.skippedCount} gerakan dilangkau.\n' : ''}\nTarik nafas. Anda sudah melakukannya.',
+        AppStrings.of(context).text('finishedBody', {
+          'completed': _controller.completedCount,
+          'total': _controller.exercises.length,
+          'skipped': _controller.skippedCount,
+        }),
       ),
       actions: [
         TextButton(
           onPressed: () => Navigator.pop(dialogContext),
-          child: const Text('TUTUP'),
+          child: Text(AppStrings.of(context).text('close')),
         ),
         FilledButton(
           onPressed: () {
             Navigator.pop(dialogContext);
             _reset();
           },
-          child: const Text('SESI BAHARU'),
+          child: Text(AppStrings.of(context).text('newSession')),
         ),
       ],
     ),
@@ -128,18 +129,18 @@ class _WorkoutScreenState extends State<WorkoutScreen>
         !controller.isRunning &&
         !controller.isFinished;
     final label = controller.isFinished
-        ? 'SELESAI'
+        ? AppStrings.of(context).text('finished')
         : paused
-        ? 'DIJEDA'
+        ? AppStrings.of(context).text('paused')
         : rest
-        ? 'REHAT'
+        ? AppStrings.of(context).text('rest')
         : controller.hasStarted
-        ? 'SENAMAN'
-        : 'BERSEDIA';
+        ? AppStrings.of(context).text('workout')
+        : AppStrings.of(context).text('ready');
     return Scaffold(
       appBar: AppBar(
         titleSpacing: 24,
-        title: const Row(
+        title: Row(
           children: [
             Icon(Icons.bolt_rounded, color: AppColors.green, size: 29),
             SizedBox(width: 4),
@@ -159,7 +160,9 @@ class _WorkoutScreenState extends State<WorkoutScreen>
         ),
         actions: [
           IconButton(
-            tooltip: _soundEnabled ? 'Matikan bunyi' : 'Hidupkan bunyi',
+            tooltip: _soundEnabled
+                ? AppStrings.of(context).text('mute')
+                : AppStrings.of(context).text('unmute'),
             onPressed: () {
               setState(() => _soundEnabled = !_soundEnabled);
               if (!_soundEnabled) unawaited(_feedback.stop());
@@ -171,24 +174,24 @@ class _WorkoutScreenState extends State<WorkoutScreen>
               color: AppColors.muted,
             ),
           ),
-          const SizedBox(width: 14),
+          SizedBox(width: 14),
         ],
       ),
       body: SafeArea(
         top: false,
         child: SingleChildScrollView(
-          padding: const EdgeInsets.fromLTRB(24, 12, 24, 28),
+          padding: EdgeInsets.fromLTRB(24, 12, 24, 28),
           child: Center(
             child: ConstrainedBox(
-              constraints: const BoxConstraints(maxWidth: 520),
+              constraints: BoxConstraints(maxWidth: 520),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-                  const Row(
+                  Row(
                     children: [
                       Expanded(
                         child: Text(
-                          'LATIHAN HARI INI',
+                          AppStrings.of(context).text('todaysWorkout'),
                           style: TextStyle(
                             color: AppColors.muted,
                             letterSpacing: 2,
@@ -201,7 +204,7 @@ class _WorkoutScreenState extends State<WorkoutScreen>
                       Icon(Icons.circle, color: AppColors.green, size: 6),
                       SizedBox(width: 6),
                       Text(
-                        'INTERVAL',
+                        AppStrings.of(context).text('interval'),
                         style: TextStyle(
                           color: AppColors.green,
                           fontSize: 10,
@@ -211,37 +214,42 @@ class _WorkoutScreenState extends State<WorkoutScreen>
                       ),
                     ],
                   ),
-                  const SizedBox(height: 10),
+                  SizedBox(height: 10),
                   Text(
-                    widget.workoutName,
-                    style: const TextStyle(
+                    widget.workoutName ??
+                        AppStrings.of(context).text('upperBody'),
+                    style: TextStyle(
                       fontSize: 35,
                       fontWeight: FontWeight.w800,
                       height: 1.05,
                       letterSpacing: -1.1,
                     ),
                   ),
-                  const SizedBox(height: 14),
+                  SizedBox(height: 14),
                   Wrap(
                     spacing: 18,
                     runSpacing: 8,
                     children: [
                       _Meta(
                         icon: Icons.fitness_center_rounded,
-                        text: '${controller.exercises.length} gerakan',
+                        text: AppStrings.of(context).text('exerciseCount', {
+                          'count': controller.exercises.length,
+                        }),
                       ),
                       _Meta(
                         icon: Icons.timer_outlined,
-                        text:
-                            '${controller.totalSeconds ~/ 60}m ${controller.totalSeconds % 60}s',
+                        text: AppStrings.of(context).text('duration', {
+                          'minutes': controller.totalSeconds ~/ 60,
+                          'seconds': controller.totalSeconds % 60,
+                        }),
                       ),
-                      const _Meta(
+                      _Meta(
                         icon: Icons.layers_outlined,
-                        text: '1 pusingan',
+                        text: AppStrings.of(context).text('oneRound'),
                       ),
                     ],
                   ),
-                  const SizedBox(height: 22),
+                  SizedBox(height: 22),
                   Row(
                     children: List.generate(
                       controller.exercises.length,
@@ -263,34 +271,43 @@ class _WorkoutScreenState extends State<WorkoutScreen>
                       ),
                     ),
                   ),
-                  const SizedBox(height: 22),
+                  SizedBox(height: 22),
                   Text(
                     controller.isFinished
-                        ? 'SESI TAMAT'
-                        : 'GERAKAN ${(controller.index + 1).toString().padLeft(2, '0')} / ${controller.exercises.length.toString().padLeft(2, '0')}',
+                        ? AppStrings.of(context).text('sessionEnded')
+                        : AppStrings.of(context).text('exerciseProgress', {
+                            'current': (controller.index + 1)
+                                .toString()
+                                .padLeft(2, '0'),
+                            'total': controller.exercises.length
+                                .toString()
+                                .padLeft(2, '0'),
+                          }),
                     textAlign: TextAlign.center,
-                    style: const TextStyle(
+                    style: TextStyle(
                       color: AppColors.muted,
                       fontSize: 10,
                       letterSpacing: 2,
                       fontWeight: FontWeight.w700,
                     ),
                   ),
-                  const SizedBox(height: 7),
+                  SizedBox(height: 7),
                   Text(
                     controller.isFinished
-                        ? 'Syabas. Terus konsisten.'
+                        ? AppStrings.of(context).text('wellDone')
                         : rest
-                        ? 'Tarik nafas seketika.'
-                        : controller.currentExercise.name,
+                        ? AppStrings.of(context).text('breathe')
+                        : controller.currentExercise.displayName(
+                            AppStrings.of(context),
+                          ),
                     textAlign: TextAlign.center,
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontSize: 25,
                       fontWeight: FontWeight.w700,
                       letterSpacing: -0.6,
                     ),
                   ),
-                  const SizedBox(height: 10),
+                  SizedBox(height: 10),
                   Center(
                     child: TimerRing(
                       progress: controller.progress,
@@ -299,7 +316,7 @@ class _WorkoutScreenState extends State<WorkoutScreen>
                       color: color,
                     ),
                   ),
-                  const SizedBox(height: 8),
+                  SizedBox(height: 8),
                   if (controller.currentExercise.assetPath
                       case final String path) ...[
                     SizedBox(
@@ -307,34 +324,33 @@ class _WorkoutScreenState extends State<WorkoutScreen>
                       child: Image.asset(
                         path,
                         fit: BoxFit.contain,
-                        errorBuilder: (_, _, _) => const Icon(
+                        errorBuilder: (_, _, _) => Icon(
                           Icons.fitness_center_rounded,
                           color: AppColors.muted,
                           size: 40,
                         ),
                       ),
                     ),
-                    const SizedBox(height: 12),
+                    SizedBox(height: 12),
                   ],
                   Text(
                     controller.isFinished
-                        ? 'Satu langkah lebih kuat hari ini.'
+                        ? AppStrings.of(context).text('strongerToday')
                         : rest
-                        ? 'Rehatkan otot. Bersedia untuk gerakan seterusnya.'
-                        : controller.currentExercise.description,
+                        ? AppStrings.of(context).text('restAdvice')
+                        : controller.currentExercise.displayDescription(
+                            AppStrings.of(context),
+                          ),
                     textAlign: TextAlign.center,
-                    style: const TextStyle(
+                    style: TextStyle(
                       color: AppColors.muted,
                       fontSize: 12,
                       height: 1.5,
                     ),
                   ),
-                  const SizedBox(height: 22),
+                  SizedBox(height: 22),
                   Container(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 16,
-                      vertical: 14,
-                    ),
+                    padding: EdgeInsets.symmetric(horizontal: 16, vertical: 14),
                     decoration: BoxDecoration(
                       color: AppColors.surface,
                       border: Border.all(color: AppColors.border),
@@ -349,13 +365,13 @@ class _WorkoutScreenState extends State<WorkoutScreen>
                           color: color,
                           size: 24,
                         ),
-                        const SizedBox(width: 14),
+                        SizedBox(width: 14),
                         Expanded(
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              const Text(
-                                'SETERUSNYA',
+                              Text(
+                                AppStrings.of(context).text('next'),
                                 style: TextStyle(
                                   color: AppColors.muted,
                                   fontSize: 9,
@@ -363,13 +379,17 @@ class _WorkoutScreenState extends State<WorkoutScreen>
                                   fontWeight: FontWeight.w700,
                                 ),
                               ),
-                              const SizedBox(height: 5),
+                              SizedBox(height: 5),
                               Text(
                                 controller.isFinished
-                                    ? 'Sesi baharu, semangat baharu'
-                                    : controller.nextExercise?.name ??
-                                          'Garisan penamat',
-                                style: const TextStyle(
+                                    ? AppStrings.of(context).text('newEnergy')
+                                    : controller.nextExercise?.displayName(
+                                            AppStrings.of(context),
+                                          ) ??
+                                          AppStrings.of(
+                                            context,
+                                          ).text('finishLine'),
+                                style: TextStyle(
                                   fontSize: 14,
                                   fontWeight: FontWeight.w600,
                                 ),
@@ -380,8 +400,11 @@ class _WorkoutScreenState extends State<WorkoutScreen>
                         if (controller.nextExercise != null &&
                             !controller.isFinished)
                           Text(
-                            '${controller.nextExercise!.workoutSeconds}s',
-                            style: const TextStyle(
+                            AppStrings.of(context).text('secondsShort', {
+                              'seconds':
+                                  controller.nextExercise!.workoutSeconds,
+                            }),
+                            style: TextStyle(
                               color: AppColors.muted,
                               fontSize: 13,
                             ),
@@ -389,9 +412,9 @@ class _WorkoutScreenState extends State<WorkoutScreen>
                       ],
                     ),
                   ),
-                  const SizedBox(height: 16),
+                  SizedBox(height: 16),
                   FilledButton.icon(
-                    key: const Key('primary-control'),
+                    key: Key('primary-control'),
                     style: FilledButton.styleFrom(backgroundColor: color),
                     onPressed: () {
                       if (controller.isFinished) {
@@ -413,52 +436,51 @@ class _WorkoutScreenState extends State<WorkoutScreen>
                     ),
                     label: Text(
                       controller.isFinished
-                          ? 'SESI BAHARU'
+                          ? AppStrings.of(context).text('newSession')
                           : controller.isRunning
-                          ? 'JEDA'
+                          ? AppStrings.of(context).text('pause')
                           : controller.hasStarted
-                          ? 'SAMBUNG'
-                          : 'MULA LATIHAN',
+                          ? AppStrings.of(context).text('resume')
+                          : AppStrings.of(context).text('startWorkout'),
                     ),
                   ),
-                  const SizedBox(height: 10),
+                  SizedBox(height: 10),
                   Row(
                     children: [
                       Expanded(
                         child: OutlinedButton.icon(
                           onPressed: controller.hasStarted ? _reset : null,
-                          icon: const Icon(Icons.restart_alt_rounded, size: 19),
-                          label: const Text(
-                            'SEMULA',
+                          icon: Icon(Icons.restart_alt_rounded, size: 19),
+                          label: Text(
+                            AppStrings.of(context).text('reset'),
                             style: TextStyle(fontSize: 11, letterSpacing: 1),
                           ),
                         ),
                       ),
-                      const SizedBox(width: 10),
+                      SizedBox(width: 10),
                       Expanded(
                         child: OutlinedButton.icon(
                           onPressed:
                               controller.hasStarted && !controller.isFinished
                               ? controller.skip
                               : null,
-                          icon: const Icon(Icons.skip_next_rounded, size: 19),
+                          icon: Icon(Icons.skip_next_rounded, size: 19),
                           label: Text(
-                            rest ? 'LANGKAU REHAT' : 'LANGKAU',
-                            style: const TextStyle(
-                              fontSize: 11,
-                              letterSpacing: 1,
-                            ),
+                            rest
+                                ? AppStrings.of(context).text('skipRest')
+                                : AppStrings.of(context).text('skip'),
+                            style: TextStyle(fontSize: 11, letterSpacing: 1),
                           ),
                         ),
                       ),
                     ],
                   ),
-                  const SizedBox(height: 30),
-                  const Row(
+                  SizedBox(height: 30),
+                  Row(
                     children: [
                       Expanded(
                         child: Text(
-                          'Pelan latihan',
+                          AppStrings.of(context).text('workoutPlan'),
                           style: TextStyle(
                             fontSize: 18,
                             fontWeight: FontWeight.w700,
@@ -467,7 +489,7 @@ class _WorkoutScreenState extends State<WorkoutScreen>
                       ),
                       SizedBox(width: 12),
                       Text(
-                        '01 SET',
+                        AppStrings.of(context).text('oneSet'),
                         style: TextStyle(
                           color: AppColors.muted,
                           fontSize: 10,
@@ -476,7 +498,7 @@ class _WorkoutScreenState extends State<WorkoutScreen>
                       ),
                     ],
                   ),
-                  const SizedBox(height: 14),
+                  SizedBox(height: 14),
                   ...controller.exercises.asMap().entries.map(
                     (entry) => ExerciseTile(
                       exercise: entry.value,
@@ -490,8 +512,8 @@ class _WorkoutScreenState extends State<WorkoutScreen>
                       isLast: entry.key == controller.exercises.length - 1,
                     ),
                   ),
-                  const SizedBox(height: 14),
-                  const Row(
+                  SizedBox(height: 14),
+                  Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       Icon(
@@ -502,7 +524,7 @@ class _WorkoutScreenState extends State<WorkoutScreen>
                       SizedBox(width: 7),
                       Flexible(
                         child: Text(
-                          'Skrin kekal aktif semasa latihan berjalan',
+                          AppStrings.of(context).text('screenAwake'),
                           style: TextStyle(
                             color: AppColors.muted,
                             fontSize: 10,
@@ -531,8 +553,8 @@ class _Meta extends StatelessWidget {
     mainAxisSize: MainAxisSize.min,
     children: [
       Icon(icon, size: 14, color: AppColors.muted),
-      const SizedBox(width: 6),
-      Text(text, style: const TextStyle(color: AppColors.muted, fontSize: 11)),
+      SizedBox(width: 6),
+      Text(text, style: TextStyle(color: AppColors.muted, fontSize: 11)),
     ],
   );
 }

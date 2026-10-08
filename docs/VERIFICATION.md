@@ -1,4 +1,47 @@
-# Pengesahan binaan 1.3.0+4
+# Pengesahan binaan 1.4.0+5
+
+Tarikh: 8 Oktober 2026
+
+- `flutter analyze`: tiada isu.
+- `flutter test`: 62 ujian lulus.
+- Penjana mengesahkan enam katalog lengkap, 187 mesej setiap bahasa dan placeholder yang sama; ujian membandingkan JSON dengan katalog Dart yang digunakan aplikasi.
+- `flutter build apk --release`: berjaya, APK universal 55,927,836 bait.
+- `apksigner verify --verbose`: tandatangan v2 sah, kunci debug tempatan yang sama.
+- `aapt dump badging`: versi 1.4.0, versionCode 5, minimum API 24, sasaran API 36.
+- APK akhir dipasang sebagai kemas kini pada emulator API 36 arm64. Tiga rutin sedia ada serta rakaman terdahulu kekal tersedia.
+
+## Semakan bahasa
+
+- Enam bahasa diuji melalui onboarding, Tetapan, import/simpan template dan pertukaran bahasa selepas rutin disimpan. Susun atur Arab ialah kanan ke kiri; ujian menggunakan lebar 360 piksel logik.
+- Keenam-enam bahasa diuji pada kamera dan pemasa dengan skrin 320 × 640 serta skala teks 1.3; tiada overflow. Kawalan mula/rakam, tukar kamera dan pemasa kekal berfungsi.
+- Lalai Bahasa Malaysia, pemulihan bahasa tersimpan, kegagalan simpan tanpa menukar pilihan lama, pemeliharaan teks peribadi dan pengenalpastian template lama diuji secara automatik.
+- Emulator menunjukkan template Upper Body lama diterjemah apabila memilih Arab/Tamil. Nama peribadi “Latihan pagi” dan “Squat” kekal seperti asal.
+- Pilihan Arab kekal selepas pemasangan APK akhir; pilihan Tamil kekal selepas proses dihentikan dan dibuka semula. Pilihan dipulihkan ke Bahasa Malaysia selepas QA.
+- Video Arab 10.66 saat dan Tamil 7.118 saat berjaya dieksport serta disimpan ke galeri. Bingkai saat 2 menunjukkan nama rutin, status, gerakan, unit, gerakan seterusnya dan pemasa 0:18 dalam bahasa sesi. Tulisan bersambung/kompleks dirender menggunakan StaticLayout Android.
+- Ujian arkib mengesahkan bahasa sesi disimpan dalam metadata, label/template diterjemah dalam payload native dan bahasa dikekalkan selepas eksport. Rakaman baharu Arab kekal berbahasa Arab walaupun senarai aplikasi kemudian ditukar ke Tamil.
+- Tiada exception AndroidRuntime atau Flutter error dalam log semasa QA.
+
+Kamera sintetik emulator digunakan, bukan kamera hos. Telefon fizikal belum diuji. Enam bahasa disertakan secara luar talian; tiada terjemahan automatik bagi bahasa lain. Kandungan pengguna dan video siap lama tidak diterjemah semula. Bahasa dialog OS/galeri bergantung pada versi dan sokongan Android.
+
+APK: `build/releases/pulse-v1.4.0.apk`
+
+SHA-256:
+
+```text
+bb72c9a40644466036e26d3720270002c268b9eacf22075937727df1b4185c05
+```
+
+Bukti visual:
+
+- [Pilihan bahasa](screenshots/language-settings-v1.4.png)
+- [Rutin dalam Arab](screenshots/library-arabic-v1.4.png)
+- [Rutin dalam Tamil](screenshots/library-tamil-v1.4.png)
+- [MP4 dengan teks Arab](screenshots/video-arabic-v1.4.png)
+- [MP4 dengan teks Tamil](screenshots/video-tamil-v1.4.png)
+
+---
+
+# Rekod terdahulu: 1.3.0+4
 
 Tarikh: 8 Oktober 2026
 

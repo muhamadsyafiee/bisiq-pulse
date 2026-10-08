@@ -1,3 +1,4 @@
+import '../l10n/app_strings.dart';
 import 'package:flutter/material.dart';
 import '../data/workout_presets.dart';
 import '../theme/app_theme.dart';
@@ -6,78 +7,75 @@ class TemplatePickerScreen extends StatelessWidget {
   const TemplatePickerScreen({super.key});
   @override
   Widget build(BuildContext context) => Scaffold(
-    appBar: AppBar(title: const Text('Pilih template')),
+    appBar: AppBar(title: Text(AppStrings.of(context).text('pickTemplate'))),
     body: SafeArea(
       child: ListView(
-        padding: const EdgeInsets.all(24),
+        padding: EdgeInsets.all(24),
         children: [
-          const Text(
-            'Satu permulaan\nyang baik.',
+          Text(
+            AppStrings.of(context).text('templateTitle'),
             style: TextStyle(
               fontSize: 32,
               height: 1.1,
               fontWeight: FontWeight.w800,
             ),
           ),
-          const SizedBox(height: 12),
-          const Text(
-            'Pilih rutin, kemudian ubah gerakan dan masa mengikut keselesaan anda sebelum menyimpan.',
+          SizedBox(height: 12),
+          Text(
+            AppStrings.of(context).text('templateHint'),
             style: TextStyle(color: AppColors.muted, height: 1.5),
           ),
-          const SizedBox(height: 24),
+          SizedBox(height: 24),
           ...workoutTemplates.map(
             (template) => Card(
-              margin: const EdgeInsets.only(bottom: 16),
+              margin: EdgeInsets.only(bottom: 16),
               child: InkWell(
                 borderRadius: BorderRadius.circular(12),
                 onTap: () => Navigator.pop(context, template),
                 child: Padding(
-                  padding: const EdgeInsets.all(20),
+                  padding: EdgeInsets.all(20),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      const Icon(
+                      Icon(
                         Icons.fitness_center_rounded,
                         color: AppColors.green,
                       ),
-                      const SizedBox(height: 16),
+                      SizedBox(height: 16),
                       Text(
-                        template.name,
-                        style: const TextStyle(
+                        AppStrings.of(context).text(template.nameKey),
+                        style: TextStyle(
                           fontSize: 22,
                           fontWeight: FontWeight.w700,
                         ),
                       ),
-                      const SizedBox(height: 8),
+                      SizedBox(height: 8),
                       Text(
-                        template.description,
-                        style: const TextStyle(
-                          color: AppColors.muted,
-                          height: 1.5,
-                        ),
+                        AppStrings.of(context).text(template.descriptionKey),
+                        style: TextStyle(color: AppColors.muted, height: 1.5),
                       ),
-                      const SizedBox(height: 12),
+                      SizedBox(height: 12),
                       Text(
-                        '${template.exercises.length} gerakan • ${template.exercises.first.workoutSeconds}s senaman / ${template.exercises.first.restSeconds}s rehat',
-                        style: const TextStyle(
-                          color: AppColors.green,
-                          fontSize: 12,
-                        ),
+                        AppStrings.of(context).text('templateSummary', {
+                          'count': template.exercises.length,
+                          'work': template.exercises.first.workoutSeconds,
+                          'rest': template.exercises.first.restSeconds,
+                        }),
+                        style: TextStyle(color: AppColors.green, fontSize: 12),
                       ),
-                      const SizedBox(height: 12),
+                      SizedBox(height: 12),
                       Text(
-                        template.exercises.map((e) => e.name).join('  ·  '),
-                        style: const TextStyle(
-                          fontSize: 12,
-                          color: AppColors.muted,
-                        ),
+                        template.exercises
+                            .map((e) => e.displayName(AppStrings.of(context)))
+                            .join('  ·  '),
+                        style: TextStyle(fontSize: 12, color: AppColors.muted),
                       ),
-                      const SizedBox(height: 16),
-                      const Row(
+                      SizedBox(height: 16),
+                      Row(
                         children: [
                           Expanded(
                             child: Text(
-                              'GUNAKAN TEMPLATE',
+                              AppStrings.of(context).text('useTemplateButton'),
                               style: TextStyle(
                                 fontWeight: FontWeight.w700,
                                 fontSize: 12,

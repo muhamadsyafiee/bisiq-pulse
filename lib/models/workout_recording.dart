@@ -7,6 +7,7 @@ class WorkoutRecording {
     required this.plan,
     required this.createdAt,
     this.display,
+    this.languageCode = 'ms',
     this.exported = false,
     this.gallerySaved = false,
   });
@@ -14,6 +15,7 @@ class WorkoutRecording {
   final WorkoutPlan plan;
   final DateTime createdAt;
   final CameraDisplaySettings? display;
+  final String languageCode;
   final bool exported;
   final bool gallerySaved;
 
@@ -23,6 +25,7 @@ class WorkoutRecording {
         plan: plan,
         createdAt: createdAt,
         display: display,
+        languageCode: languageCode,
         exported: exported ?? this.exported,
         gallerySaved: gallerySaved ?? this.gallerySaved,
       );
@@ -31,6 +34,7 @@ class WorkoutRecording {
     'plan': plan.toJson(),
     'createdAt': createdAt.toIso8601String(),
     if (display != null) 'display': display!.toJson(),
+    'languageCode': languageCode,
     'exported': exported,
     'gallerySaved': gallerySaved,
   };
@@ -50,6 +54,17 @@ class WorkoutRecording {
               Map<String, dynamic>.from(json['display'] as Map),
             )
           : null,
+      languageCode:
+          const [
+            'ms',
+            'en',
+            'id',
+            'zh',
+            'ta',
+            'ar',
+          ].contains(json['languageCode'])
+          ? json['languageCode'] as String
+          : 'ms',
       exported: json['exported'] == true,
       gallerySaved: json['gallerySaved'] == true,
     );

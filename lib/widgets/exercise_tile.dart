@@ -1,3 +1,4 @@
+import '../l10n/app_strings.dart';
 import 'package:flutter/material.dart';
 
 import '../models/exercise.dart';
@@ -56,7 +57,7 @@ class ExerciseTile extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                exercise.name,
+                exercise.displayName(AppStrings.of(context)),
                 style: TextStyle(
                   fontWeight: FontWeight.w700,
                   color: passed ? AppColors.muted : AppColors.text,
@@ -64,7 +65,14 @@ class ExerciseTile extends StatelessWidget {
               ),
               const SizedBox(height: 4),
               Text(
-                '${exercise.workoutSeconds}s senaman${isLast ? ' • Penamat' : ' / ${exercise.restSeconds}s rehat'}',
+                isLast
+                    ? AppStrings.of(
+                        context,
+                      ).text('lastTiming', {'work': exercise.workoutSeconds})
+                    : AppStrings.of(context).text('exerciseTiming', {
+                        'work': exercise.workoutSeconds,
+                        'rest': exercise.restSeconds,
+                      }),
                 style: const TextStyle(color: AppColors.muted, fontSize: 12),
               ),
             ],

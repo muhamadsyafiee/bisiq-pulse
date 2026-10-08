@@ -1,3 +1,4 @@
+import '../l10n/app_strings.dart';
 import 'package:flutter/semantics.dart';
 import 'package:flutter/material.dart';
 import '../models/camera_display_settings.dart';
@@ -59,30 +60,31 @@ class _DraggableCameraPanelState extends State<DraggableCameraPanel> {
             width: width,
             height: height,
             child: Semantics(
-              label:
-                  'Panel pemasa. Seret untuk ubah kedudukan sebelum merakam.',
+              label: AppStrings.of(context).text('panelSemantics'),
               customSemanticsActions: onChanged == null
                   ? null
                   : {
-                      const CustomSemanticsAction(label: 'Pindah ke atas'): () {
+                      CustomSemanticsAction(
+                        label: AppStrings.of(context).text('panelTop'),
+                      ): () {
                         move(settings.x, 0);
                         onChangeEnd();
                       },
-                      const CustomSemanticsAction(
-                        label: 'Pindah ke tengah',
+                      CustomSemanticsAction(
+                        label: AppStrings.of(context).text('panelMiddle'),
                       ): () {
                         move(.5, .5);
                         onChangeEnd();
                       },
-                      const CustomSemanticsAction(
-                        label: 'Pindah ke bawah',
+                      CustomSemanticsAction(
+                        label: AppStrings.of(context).text('panelBottom'),
                       ): () {
                         move(settings.x, 1);
                         onChangeEnd();
                       },
                     },
               child: GestureDetector(
-                key: const Key('draggable-camera-panel'),
+                key: Key('draggable-camera-panel'),
                 behavior: HitTestBehavior.opaque,
                 // Separate axis recognizers win against the surrounding vertical
                 // scroll view. Global deltas still allow free diagonal movement.

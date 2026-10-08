@@ -58,6 +58,13 @@ class CameraWorkoutSession extends ChangeNotifier {
     _notify();
   }
 
+  String _languageCode = 'ms';
+  void setLanguage(String code) {
+    if (status == CaptureStatus.ready && !timer.hasStarted) {
+      _languageCode = code;
+    }
+  }
+
   bool microphone = false;
   bool interrupted = false;
   bool _foreground = true;
@@ -101,8 +108,7 @@ class CameraWorkoutSession extends ChangeNotifier {
       status = CaptureStatus.ready;
     } catch (_) {
       status = CaptureStatus.error;
-      error =
-          'Kamera tidak dapat dibuka. Benarkan akses kamera dalam Tetapan, kemudian cuba lagi. Jika mikrofon ditolak, matikannya untuk rakaman senyap.';
+      error = 'cameraOpenError';
     }
     _notify();
   });
@@ -115,7 +121,7 @@ class CameraWorkoutSession extends ChangeNotifier {
       status = CaptureStatus.ready;
     } catch (_) {
       status = CaptureStatus.error;
-      error = 'Kamera ini tidak dapat dibuka. Cuba lagi.';
+      error = 'cameraSwitchError';
     }
     _notify();
   });
@@ -131,8 +137,7 @@ class CameraWorkoutSession extends ChangeNotifier {
       status = CaptureStatus.ready;
     } catch (_) {
       status = CaptureStatus.error;
-      error =
-          'Akses kamera atau mikrofon tidak tersedia. Matikan mikrofon atau semak izin dalam Tetapan.';
+      error = 'cameraMicError';
     }
     _notify();
   });
@@ -148,7 +153,7 @@ class CameraWorkoutSession extends ChangeNotifier {
       await feedback.setAwake(true);
     } catch (_) {
       status = CaptureStatus.ready;
-      error = 'Rakaman gagal dimulakan. Cuba lagi.';
+      error = 'recordStartError';
     }
     _notify();
   });
@@ -167,14 +172,17 @@ class CameraWorkoutSession extends ChangeNotifier {
     _notify();
     try {
       _pendingPath = await capture.stop();
-      recording = await archive.keep(_pendingPath!, plan, display: _display);
+      recording = await archive.keep(
+        _pendingPath!,
+        plan,
+        display: _display,
+        languageCode: _languageCode,
+      );
       _pendingPath = null;
       status = CaptureStatus.finished;
     } catch (_) {
       status = CaptureStatus.error;
-      error = _pendingPath != null
-          ? 'Video belum dapat disimpan. Cuba simpan semula sebelum keluar.'
-          : 'Rakaman tidak dapat diselesaikan. Rakaman yang terlalu singkat mungkin tidak menghasilkan video.';
+      error = _pendingPath != null ? 'recordSaveError' : 'recordStopError';
     }
     await capture.close();
     // Release this screen's platform resources before the export screen takes
@@ -188,14 +196,19 @@ class CameraWorkoutSession extends ChangeNotifier {
     status = CaptureStatus.saving;
     _notify();
     try {
-      recording = await archive.keep(_pendingPath!, plan, display: _display);
+      recording = await archive.keep(
+        _pendingPath!,
+        plan,
+        display: _display,
+        languageCode: _languageCode,
+      );
       _pendingPath = null;
       error = null;
       status = CaptureStatus.finished;
       await _disposeFeedback();
     } catch (_) {
       status = CaptureStatus.error;
-      error = 'Simpanan gagal. Semak ruang telefon dan cuba lagi.';
+      error = 'storageError';
     }
     _notify();
   });
