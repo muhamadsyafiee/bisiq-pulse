@@ -29,11 +29,26 @@ android {
         versionName = flutter.versionName
     }
 
+    // Play bundles are signed with the upload key supplied by
+    // scripts/build_play_bundle.sh; sideload APKs keep the debug key so
+    // existing GitHub installs can still update in place.
+    val uploadKeystore = System.getenv("PULSE_UPLOAD_KEYSTORE")
+    val uploadPassword = System.getenv("PULSE_UPLOAD_PASSWORD")
+    signingConfigs {
+        if (uploadKeystore != null && uploadPassword != null) {
+            create("upload") {
+                storeFile = file(uploadKeystore)
+                storePassword = uploadPassword
+                keyAlias = "upload"
+                keyPassword = uploadPassword
+            }
+        }
+    }
+
     buildTypes {
         release {
-            // TODO: Add your own signing config for the release build.
-            // Signing with the debug keys for now, so `flutter run --release` works.
-            signingConfig = signingConfigs.getByName("debug")
+            signingConfig = signingConfigs.findByName("upload")
+                ?: signingConfigs.getByName("debug")
         }
     }
 }

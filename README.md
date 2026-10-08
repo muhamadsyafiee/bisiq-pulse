@@ -42,7 +42,7 @@ Pasang pada telefon/emulator yang disambungkan:
 adb install -r build/app/outputs/flutter-apk/app-release.apk
 ```
 
-Konfigurasi lalai menggunakan debug signing bagi APK release untuk pemasangan dan ujian tempatan. Sebelum edaran rasmi/Play Store, konfigurasi kunci release milik anda mengikut [panduan signing Flutter](https://docs.flutter.dev/deployment/android#sign-the-app). Jangan komit fail keystore atau kata laluan.
+APK release untuk GitHub menggunakan debug signing untuk pemasangan dan ujian tempatan. Binaan Google Play (AAB) ditandatangani dengan kunci muat naik PULSE melalui `scripts/build_play_bundle.sh`; keystore berada di luar repo dan kata laluannya dalam macOS Keychain. Sebelum edaran rasmi/Play Store, konfigurasi kunci release milik anda mengikut [panduan signing Flutter](https://docs.flutter.dev/deployment/android#sign-the-app). Jangan komit fail keystore atau kata laluan.
 
 ## PULSE Pro — versi 1.5.0
 

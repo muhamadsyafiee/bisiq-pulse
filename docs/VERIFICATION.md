@@ -1,3 +1,24 @@
+# Pengesahan binaan 1.5.1+7
+
+Tarikh: 9 Oktober 2026
+
+- Tiada perubahan kod Dart berbanding 1.5.0. `flutter analyze` tiada isu; 74 ujian lulus.
+- APK GitHub (`pulse-v1.5.1.apk`, 58,365,421 bait): versi 1.5.1, versionCode 7, kunci debug tempatan yang sama (`f193a1df…4292`). Dipasang sebagai kemas kini ke atas 1.5.0 pada emulator API 36; tiga rutin kekal dan tiada ralat dalam log.
+- AAB Play (58,765,994 bait, SHA-256 `4c4e5f18…21ba`) ditandatangani dengan kunci muat naik (sijil SHA-256 `A6:DC:2C:76…75:78`). Amaran Flutter tentang strip simbol berlaku kerana `cmdline-tools` tiada pada mesin; `llvm-objdump` mengesahkan tiada seksyen `.debug_*` dalam semua pustaka native AAB.
+- Google Play Developer API: AAB diterima (versionCode 7, SHA-256 sepadan) dan dimasukkan ke trek internal sebagai draf. Produk `pulse_pro_lifetime` dicipta dan pilihan beli `lifetime` berstatus ACTIVE, RM19.90 di Malaysia.
+- Pelayan `pulse-billing` kini boleh membaca aplikasi PULSE; token palsu dipulangkan sebagai `403` oleh Google, bukan ralat konfigurasi.
+- Pembelian sebenar pada telefon belum diuji; keluaran internal masih draf.
+
+APK: `build/releases/pulse-v1.5.1.apk`
+
+SHA-256:
+
+```text
+52ced39cf70c7866368d5b2565a266eba168dd8025d1c000f65112ef8974e424
+```
+
+---
+
 # Pengesahan binaan 1.5.0+6
 
 Tarikh: 8 Oktober 2026

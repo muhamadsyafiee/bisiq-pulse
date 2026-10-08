@@ -23,14 +23,25 @@ gcloud run deploy pulse-billing --source backend --project bisiq-backend --regio
 
 Menukar kunci peribadi memerlukan kunci awam baharu dalam `config/pulse_billing.json` dan APK baharu; lesen yang dikeluarkan dengan kunci lama tidak lagi diterima.
 
-## Langkah Play Console yang masih diperlukan
+## Status Play Console
 
-1. Cipta aplikasi `com.pulseworkout.gym_timer` dan muat naik AAB yang dibina dengan `--dart-define-from-file=config/pulse_billing.json` ke trek ujian dalaman. AAB memerlukan kunci muat naik (upload key) sendiri, bukan kunci debug.
-2. Cipta produk sekali beli (one-time product) `pulse_pro_lifetime`, harga RM19.90, dan aktifkan.
-3. **Pengguna dan kebenaran** → jemput `bisiq-play-api@bisiq-backend.iam.gserviceaccount.com` dengan kebenaran *View financial data* dan *Manage orders and subscriptions* untuk aplikasi PULSE.
-4. Tambah akaun penguji lesen, pasang daripada trek ujian dalaman, kemudian uji beli, bayaran tertunda, bayaran balik dan **Pulihkan Pembelian**.
+Selesai (9 Oktober 2026):
 
-Semakan pantas selepas langkah 3: permintaan dengan token palsu sepatutnya memulangkan `403`, bukan `503`.
+- Aplikasi `com.pulseworkout.gym_timer` wujud dan service account mempunyai akses.
+- AAB 1.5.1 (versionCode 7), ditandatangani dengan kunci muat naik, berada dalam trek ujian dalaman sebagai draf.
+- Produk `pulse_pro_lifetime`, pilihan beli `lifetime` (legacy compatible), AKTIF pada RM19.90 di Malaysia.
+
+Masih perlu dibuat dalam Play Console:
+
+1. **Ujian dalaman** → tambah senarai penguji (e-mel Google) → semak dan lancarkan keluaran draf 1.5.1.
+2. **Tetapan → Ujian lesen** → tambah akaun penguji yang sama supaya pembelian ujian tidak dicaj.
+3. Pada telefon penguji, buka pautan opt-in ujian dalaman, nyahpasang APK GitHub jika ada, pasang PULSE daripada Play Store, kemudian uji beli, pembayaran tertunda, bayaran balik dan **Pulihkan Pembelian**.
+
+Membina dan memuat naik AAB baharu:
+
+```bash
+scripts/build_play_bundle.sh
+```
 
 ## Ujian
 

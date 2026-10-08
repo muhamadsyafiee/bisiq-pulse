@@ -1,5 +1,24 @@
 # Changelog
 
+## [1.5.1] — 2026-10-09
+
+### Ditambah
+
+- Binaan Google Play: `scripts/build_play_bundle.sh` membina AAB yang ditandatangani dengan kunci muat naik PULSE. Keystore disimpan di luar repo (`~/.config/pulse/`) dan kata laluannya dalam macOS Keychain.
+- AAB 1.5.1 (versionCode 7) dimuat naik ke trek **ujian dalaman** Play Console sebagai draf. Google Play App Signing memegang kunci aplikasi.
+- Produk sekali beli `pulse_pro_lifetime` dicipta dan diaktifkan: **RM19.90** di Malaysia, dengan harga setara automatik bagi 174 wilayah lain.
+- Pelayan pengesahan kini mempunyai akses ke aplikasi PULSE dalam Play Console.
+
+### Keserasian
+
+- APK GitHub kekal ditandatangani dengan kunci debug tempatan yang sama dan boleh dikemas kini terus ke atas 1.5.0. Tiada perubahan fungsi aplikasi berbanding 1.5.0.
+- Pemasangan Play Store menggunakan kunci tandatangan Google yang berbeza. Untuk bertukar daripada APK GitHub ke Play Store, pengguna perlu nyahpasang dahulu; rutin dan rakaman tempatan tidak dipindahkan.
+
+### Had diketahui
+
+- Keluaran ujian dalaman masih draf. Ia perlu dilancarkan kepada penguji dalam Play Console sebelum pembelian sebenar boleh diuji.
+- APK GitHub tidak boleh membeli Pro; Google Play Billing hanya berfungsi untuk pemasangan daripada Play Store.
+
 ## [1.5.0] — 2026-10-08
 
 ### Ditambah
