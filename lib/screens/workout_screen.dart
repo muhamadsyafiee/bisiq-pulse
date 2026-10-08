@@ -15,9 +15,11 @@ class WorkoutScreen extends StatefulWidget {
     super.key,
     this.exercises = defaultExercises,
     this.feedback,
+    this.workoutName = 'Upper body.\nStronger you.',
   });
   final List<Exercise> exercises;
   final WorkoutFeedback? feedback;
+  final String workoutName;
 
   @override
   State<WorkoutScreen> createState() => _WorkoutScreenState();
@@ -141,12 +143,16 @@ class _WorkoutScreenState extends State<WorkoutScreen>
           children: [
             Icon(Icons.bolt_rounded, color: AppColors.green, size: 29),
             SizedBox(width: 4),
-            Text(
-              'PULSE',
-              style: TextStyle(
-                fontWeight: FontWeight.w900,
-                letterSpacing: 4,
-                fontSize: 20,
+            Flexible(
+              child: Text(
+                'PULSE',
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: TextStyle(
+                  fontWeight: FontWeight.w900,
+                  letterSpacing: 4,
+                  fontSize: 20,
+                ),
               ),
             ),
           ],
@@ -195,7 +201,7 @@ class _WorkoutScreenState extends State<WorkoutScreen>
                       Icon(Icons.circle, color: AppColors.green, size: 6),
                       SizedBox(width: 6),
                       Text(
-                        'TABATA',
+                        'INTERVAL',
                         style: TextStyle(
                           color: AppColors.green,
                           fontSize: 10,
@@ -206,9 +212,9 @@ class _WorkoutScreenState extends State<WorkoutScreen>
                     ],
                   ),
                   const SizedBox(height: 10),
-                  const Text(
-                    'Upper body.\nStronger you.',
-                    style: TextStyle(
+                  Text(
+                    widget.workoutName,
+                    style: const TextStyle(
                       fontSize: 35,
                       fontWeight: FontWeight.w800,
                       height: 1.05,

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
-import 'screens/workout_screen.dart';
+import 'screens/library_screen.dart';
+import 'services/workout_library.dart';
 import 'theme/app_theme.dart';
 
 void main() {
@@ -9,13 +10,14 @@ void main() {
 }
 
 class WorkoutTimerApp extends StatelessWidget {
-  const WorkoutTimerApp({super.key});
+  const WorkoutTimerApp({super.key, this.storage});
+  final LibraryStorage? storage;
 
   @override
   Widget build(BuildContext context) => MaterialApp(
     title: 'PULSE • Workout Timer',
     debugShowCheckedModeBanner: false,
     theme: buildAppTheme(),
-    home: const WorkoutScreen(),
+    home: LibraryScreen(storage: storage),
   );
 }

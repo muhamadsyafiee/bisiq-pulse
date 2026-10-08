@@ -42,10 +42,23 @@ adb install -r build/app/outputs/flutter-apk/app-release.apk
 
 Konfigurasi lalai menggunakan debug signing bagi APK release untuk pemasangan dan ujian tempatan. Sebelum edaran rasmi/Play Store, konfigurasi kunci release milik anda mengikut [panduan signing Flutter](https://docs.flutter.dev/deployment/android#sign-the-app). Jangan komit fail keystore atau kata laluan.
 
-## Fungsi
+## Rutin peribadi — versi 1.1.0
 
-- Empat gerakan: Pushup, Diamond Pushup, Widearm Pushup dan Chest Squeeze.
-- Setiap gerakan: 20 saat senaman dan 10 saat rehat antara gerakan. Jumlah sesi: **1 minit 50 saat**. Tiada rehat selepas gerakan terakhir.
+Pada penggunaan pertama, pengguna memilih **Guna template** atau **Cipta latihan sendiri**. Onboarding hanya selesai selepas rutin pertama berjaya disimpan; membatalkan editor akan kembali ke pilihan awal.
+
+- **Latihan Saya** menyimpan banyak rutin berasingan. Setiap rutin boleh dibuka dalam pemasa, diedit atau dipadam.
+- Tiga template tersedia: **Upper Body**, **Cardio Express** dan **Regangan Ringkas**. Template disalin ke editor supaya nama, gerakan dan masa boleh diubah sebelum disimpan.
+- Editor menyediakan nama rutin, nama setiap gerakan, durasi senaman, durasi rehat dan nota pilihan. Gerakan boleh ditambah, dibuang dan disusun semula menggunakan anak panah.
+- Validasi: nama tidak boleh kosong; senaman **1–3600 saat**, rehat **0–3600 saat**; sekurang-kurangnya satu gerakan. Rehat sifar terus bertukar ke gerakan seterusnya.
+- Rutin dan status onboarding disimpan bersama sebagai JSON berversi menggunakan `SharedPreferencesAsync` (storan tempatan Android). Data kekal apabila aplikasi ditutup atau dikemas kini; tiada akaun atau penyegerakan awan. Nyahpasang atau padam data aplikasi akan membuang simpanan tempatan, tertakluk kepada pemulihan sandaran Android.
+- Kegagalan baca/simpan dipaparkan dengan pilihan cuba lagi. Data sedia ada tidak ditimpa apabila tidak dapat dibaca, dan input editor dikekalkan apabila simpanan gagal.
+- Keluar daripada editor dengan perubahan belum disimpan memerlukan pengesahan. Memadam rutin juga memerlukan pengesahan.
+- Pengguna versi 1.0 akan melihat onboarding sekali kerana versi tersebut belum mempunyai simpanan rutin peribadi.
+
+## Fungsi pemasa
+
+- Template Upper Body mempunyai empat gerakan: Pushup, Diamond Pushup, Widearm Pushup dan Chest Squeeze.
+- Bagi template Upper Body, setiap gerakan: 20 saat senaman dan 10 saat rehat antara gerakan. Jumlah sesi: **1 minit 50 saat**. Tiada rehat selepas gerakan terakhir.
 - Ring `CustomPainter` berkurang secara lancar: hijau untuk senaman, oren untuk rehat. Status juga dilabel dengan teks.
 - Nama gerakan semasa, arahan ringkas, gerakan seterusnya dan pelan latihan.
 - **MULA LATIHAN**, **JEDA / SAMBUNG**, **SEMULA**, **LANGKAU**.
@@ -66,11 +79,16 @@ Aplikasi ini **tidak menggunakan Android foreground service**. Bunyi dimainkan k
 ```text
 lib/
   main.dart                       # Tema dan titik mula aplikasi
-  data/workout_presets.dart       # Senarai gerakan lalai
-  models/exercise.dart            # Nama, masa senaman/rehat, aset pilihan
-  screens/workout_screen.dart     # UI, lifecycle, dialog, kawalan
+  data/workout_presets.dart       # Katalog tiga template
+  models/exercise.dart            # Gerakan dan serialisasi JSON
+  models/workout_plan.dart        # Rutin tersimpan dengan ID unik
+  screens/library_screen.dart     # Onboarding dan Latihan Saya
+  screens/template_picker_screen.dart # Pilihan template
+  screens/workout_editor_screen.dart # Editor rutin dan gerakan
+  screens/workout_screen.dart     # UI pemasa, lifecycle dan kawalan
   services/workout_controller.dart # Mesin keadaan dan pengiraan masa
   services/workout_feedback.dart  # audioplayers dan wakelock_plus
+  services/workout_library.dart   # Penyimpanan tempatan dan pengurusan rutin
   theme/app_theme.dart            # Warna dan gaya komponen
   widgets/
     timer_ring.dart               # Ring tersuai, tiada percent_indicator
@@ -81,7 +99,7 @@ test/                             # Ujian logik dan interaksi widget
 android/                          # Projek Gradle, manifest, ikon dan splash
 ```
 
-Ubah senarai atau tempoh latihan dalam `lib/data/workout_presets.dart`. Durasi senaman mesti lebih daripada sifar; durasi rehat boleh sifar. Senarai mesti mempunyai sekurang-kurangnya satu gerakan.
+Pengguna boleh mengubah rutin terus dalam aplikasi. Untuk mengubah katalog template bagi pembangunan, edit `lib/data/workout_presets.dart`. Durasi senaman mesti lebih daripada sifar; durasi rehat boleh sifar. Senarai mesti mempunyai sekurang-kurangnya satu gerakan.
 
 Untuk gambar/GIF, tambah fail ke `assets/exercises/`, daftar direktori tersebut di bawah `flutter.assets` dalam `pubspec.yaml`, kemudian isi `assetPath`, contohnya `assets/exercises/pushup.gif`.
 
@@ -91,4 +109,12 @@ Ujian meliputi urutan workout/rest/finished, kira detik 3–2–1, pause/resume 
 
 Bunyi WAV dijana sendiri melalui `python3 scripts/generate_audio.py` dan boleh digunakan bersama projek ini. Pakej dikunci melalui `pubspec.lock`.
 
-Binaan ini telah lulus 13 ujian dan analisis statik, serta berjaya dipasang dan diuji pada emulator Android API 36. Lihat [rekod pengesahan](docs/VERIFICATION.md) dan [tangkapan skrin](docs/screenshots/ready.png).
+Binaan ini telah lulus 26 ujian dan analisis statik, serta berjaya dipasang dan diuji pada emulator Android API 36. Lihat [rekod pengesahan](docs/VERIFICATION.md) dan [tangkapan skrin Latihan Saya](docs/screenshots/library.png).
+
+Ujian versi 1.1 turut meliputi onboarding kedua-dua laluan, import template, banyak rutin, edit/padam, susunan gerakan, validasi masa, pemulihan simpanan selepas restart, pembatalan editor, kegagalan simpan dan data rosak.
+
+## Release dan changelog
+
+Muat turun APK daripada [GitHub Releases](https://github.com/muhamadsyafiee/bisiq-pulse/releases). Lihat [CHANGELOG.md](CHANGELOG.md) untuk perubahan setiap versi.
+
+Setiap perubahan aplikasi yang siap akan diuji, dibina sebagai APK versi baharu, di-commit dan di-push, kemudian diterbitkan bersama APK dan checksum SHA-256 dalam GitHub Release. Aliran tetap projek direkodkan dalam [AGENTS.md](AGENTS.md).

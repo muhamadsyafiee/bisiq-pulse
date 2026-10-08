@@ -24,6 +24,17 @@ ThemeData buildAppTheme() => ThemeData(
     backgroundColor: AppColors.background,
     surfaceTintColor: Colors.transparent,
   ),
+  inputDecorationTheme: InputDecorationTheme(
+    filled: true,
+    fillColor: AppColors.background,
+    border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+    enabledBorder: OutlineInputBorder(
+      borderRadius: BorderRadius.circular(12),
+      borderSide: const BorderSide(color: AppColors.border),
+    ),
+    labelStyle: const TextStyle(color: AppColors.muted),
+    errorMaxLines: 2,
+  ),
   filledButtonTheme: FilledButtonThemeData(
     style: FilledButton.styleFrom(
       minimumSize: const Size.fromHeight(58),
