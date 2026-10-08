@@ -1,6 +1,6 @@
 # PULSE — Workout Timer
 
-Aplikasi Android Flutter untuk latihan interval, dengan antaramuka gelap dan enam pilihan bahasa. Bahasa Malaysia ialah bahasa lalai. Semua bunyi tersedia secara luar talian; tiada akaun atau sambungan internet diperlukan.
+Aplikasi Android Flutter untuk latihan interval, dengan antaramuka gelap dan enam pilihan bahasa. Bahasa Malaysia ialah bahasa lalai. Semua bunyi tersedia secara luar talian; tiada akaun diperlukan, dan internet hanya digunakan untuk membeli atau mengesahkan PULSE Pro.
 
 ## Jalankan
 
@@ -23,8 +23,10 @@ Untuk pemasangan pada mesin lain, ikuti [panduan Flutter Android rasmi](https://
 ```bash
 flutter analyze
 flutter test
-flutter build apk --release
+flutter build apk --release --dart-define-from-file=config/pulse_billing.json
 ```
+
+`config/pulse_billing.json` mengandungi URL pelayan pengesahan dan kunci awam Ed25519 (bukan rahsia). Tanpa fail ini, aplikasi dibina dengan pembelian Pro dimatikan dan semua had versi percuma digunakan.
 
 APK universal: `build/app/outputs/flutter-apk/app-release.apk`.
 
@@ -41,6 +43,21 @@ adb install -r build/app/outputs/flutter-apk/app-release.apk
 ```
 
 Konfigurasi lalai menggunakan debug signing bagi APK release untuk pemasangan dan ujian tempatan. Sebelum edaran rasmi/Play Store, konfigurasi kunci release milik anda mengikut [panduan signing Flutter](https://docs.flutter.dev/deployment/android#sign-the-app). Jangan komit fail keystore atau kata laluan.
+
+## PULSE Pro — versi 1.5.0
+
+| Fungsi | Percuma | PULSE Pro |
+| --- | --- | --- |
+| Pemasa, rehat, bunyi dan semua bahasa | ✅ | ✅ |
+| Rutin sendiri | Maksimum 3 | Tanpa had |
+| Rakaman dengan pemasa | Dengan watermark PULSE | Tanpa watermark |
+| Kedudukan panel | Kedudukan asas (bawah) | Bebas seret |
+| Tema kamera | Standard | Standard + Lutsinar |
+
+- Sekali bayar melalui Google Play (`pulse_pro_lifetime`, harga permulaan dirancang RM19.90). Tiada langganan atau iklan.
+- Rutin sedia ada tidak pernah dikunci walaupun melebihi had. Tawaran Pro dipaparkan apabila mencipta rutin keempat atau memilih ciri kamera Pro sebelum merakam, bukan semasa latihan berjalan.
+- Pembelian disahkan oleh pelayan (`backend/`) sebelum Pro dibuka. Pelayan memberi lesen bertandatangan yang terikat pada pemasangan dan sah 7 hari luar talian; aplikasi menyemak semula apabila dibuka. **Pulihkan Pembelian** digunakan selepas menukar telefon.
+- Persediaan Play Console dan pelayan: lihat [backend/README.md](backend/README.md).
 
 ## Bahasa — versi 1.4.0
 
@@ -167,7 +184,7 @@ Ujian meliputi urutan workout/rest/finished, kira detik 3–2–1, pause/resume 
 
 Bunyi WAV dijana sendiri melalui `python3 scripts/generate_audio.py` dan boleh digunakan bersama projek ini. Pakej dikunci melalui `pubspec.lock`.
 
-Binaan ini telah lulus 62 ujian dan analisis statik, serta berjaya dipasang dan diuji pada emulator Android API 36. Lihat [rekod pengesahan](docs/VERIFICATION.md) dan [tangkapan skrin Latihan Saya](docs/screenshots/library.png).
+Binaan ini telah lulus 74 ujian Flutter, 12 ujian backend dan analisis statik, serta berjaya dipasang dan diuji pada emulator Android API 36. Lihat [rekod pengesahan](docs/VERIFICATION.md) dan [tangkapan skrin Latihan Saya](docs/screenshots/library.png).
 
 Ujian kamera turut meliputi izin ditolak, kegagalan mula/simpan, retry, operasi serentak, penamat automatik, gangguan ketika mula, eksport gagal tanpa kehilangan video asal dan skrin kecil dengan fon besar. Rakaman dan eksport diuji menggunakan kamera sintetik emulator; kamera dan mikrofon telefon fizikal masih perlu diuji.
 

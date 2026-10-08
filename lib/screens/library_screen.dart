@@ -1,3 +1,5 @@
+import 'pro_screen.dart';
+import '../services/pro_controller.dart';
 import 'settings_screen.dart';
 import '../l10n/app_strings.dart';
 import 'package:flutter/material.dart';
@@ -28,7 +30,10 @@ class _LibraryScreenState extends State<LibraryScreen> {
   @override
   void initState() {
     super.initState();
-    _library = WorkoutLibrary(widget.storage ?? DeviceLibraryStorage());
+    _library = WorkoutLibrary(
+      widget.storage ?? DeviceLibraryStorage(),
+      hasPro: () => ProScope.active(context),
+    );
     _load();
   }
 
@@ -50,6 +55,10 @@ class _LibraryScreenState extends State<LibraryScreen> {
     if (_opening) return;
     _opening = true;
     try {
+      if (plan == null && !_library.canCreate) {
+        await showPro(context);
+        if (!mounted || !_library.canCreate) return;
+      }
       WorkoutTemplate? template;
       if (fromTemplate) {
         template = await Navigator.push<WorkoutTemplate>(

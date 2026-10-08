@@ -67,6 +67,7 @@ class FakeArchive implements RecordingArchive {
     WorkoutPlan plan, {
     CameraDisplaySettings? display,
     String languageCode = 'ms',
+    bool watermarked = true,
   }) async {
     if (failKeep) throw StateError('disk full');
     final item = WorkoutRecording(
@@ -74,6 +75,7 @@ class FakeArchive implements RecordingArchive {
       plan: plan,
       display: display,
       languageCode: languageCode,
+      watermarked: watermarked,
       createdAt: DateTime(2026),
     );
     items.add(item);
@@ -220,6 +222,7 @@ void main() {
   );
   test('recording snapshots display and rejects changes after start', () async {
     await session.initialize();
+    session.setProAccess(true);
     session.setDisplay(
       const CameraDisplaySettings(x: .2, y: .1, transparent: true),
     );
@@ -235,6 +238,31 @@ void main() {
       'y': .1,
       'transparent': true,
     });
+  });
+  test('free recordings keep the basic panel and are watermarked', () async {
+    await session.initialize();
+    session.setDisplay(
+      const CameraDisplaySettings(x: .2, y: .1, transparent: true),
+    );
+    expect(session.display.toJson(), const CameraDisplaySettings().toJson());
+    expect(session.watermarked, true);
+    await session.start();
+    // Entitlement changes never alter a recording already in progress.
+    session.setProAccess(true);
+    expect(session.watermarked, true);
+    await session.stop();
+    expect(archive.items.single.watermarked, true);
+    expect(
+      archive.items.single.display!.toJson(),
+      const CameraDisplaySettings().toJson(),
+    );
+  });
+  test('Pro recordings are saved without watermark', () async {
+    await session.initialize();
+    session.setProAccess(true);
+    await session.start();
+    await session.stop();
+    expect(archive.items.single.watermarked, false);
   });
   test('failed storage keeps stopped file available for retry', () async {
     await session.initialize();

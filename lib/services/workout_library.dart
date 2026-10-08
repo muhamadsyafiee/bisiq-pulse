@@ -22,7 +22,10 @@ class DeviceLibraryStorage implements LibraryStorage {
 }
 
 class WorkoutLibrary extends ChangeNotifier {
-  WorkoutLibrary(this.storage);
+  WorkoutLibrary(this.storage, {bool Function()? hasPro})
+    : _hasPro = hasPro ?? (() => false);
+  final bool Function() _hasPro;
+  bool get canCreate => _hasPro() || _plans.length < 3;
   final LibraryStorage storage;
   List<WorkoutPlan> _plans = const [];
   bool _onboarded = false;
@@ -70,6 +73,7 @@ class WorkoutLibrary extends ChangeNotifier {
     final updated = [..._plans];
     final index = updated.indexWhere((p) => p.id == plan.id);
     if (index < 0) {
+      if (!canCreate) throw RoutineLimitReached();
       updated.add(plan);
     } else {
       updated[index] = plan;
@@ -107,3 +111,5 @@ class WorkoutLibrary extends ChangeNotifier {
     super.dispose();
   }
 }
+
+class RoutineLimitReached implements Exception {}

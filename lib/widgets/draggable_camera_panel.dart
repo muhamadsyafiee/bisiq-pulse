@@ -60,7 +60,9 @@ class _DraggableCameraPanelState extends State<DraggableCameraPanel> {
             width: width,
             height: height,
             child: Semantics(
-              label: AppStrings.of(context).text('panelSemantics'),
+              label: AppStrings.of(context).text(
+                onChanged == null ? 'panelLockedSemantics' : 'panelSemantics',
+              ),
               customSemanticsActions: onChanged == null
                   ? null
                   : {

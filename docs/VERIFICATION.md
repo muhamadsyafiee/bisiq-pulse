@@ -1,3 +1,42 @@
+# Pengesahan binaan 1.5.0+6
+
+Tarikh: 8 Oktober 2026
+
+- `flutter analyze`: tiada isu.
+- `flutter test`: 74 ujian lulus, termasuk had 3 rutin (rutin lama kekal boleh diedit), watermark/kedudukan asas bagi rakaman percuma, rakaman Pro tanpa watermark, entitlement tidak berubah semasa rakaman, aliran beli/pulih/tertunda/batal/ralat/ditolak, dan lesen yang ditandatangani oleh kod backend sebenar (tandatangan diubah, pemasangan lain, kunci lain dan lesen tamat ditolak).
+- `npm test` (backend): 12 ujian lulus, termasuk ralat konfigurasi Play Console tidak dianggap sebagai pembelian ditolak.
+- Penjana mengesahkan enam katalog lengkap, 214 mesej setiap bahasa.
+- `flutter build apk --release --dart-define-from-file=config/pulse_billing.json`: berjaya, APK universal 58,365,417 bait. URL pelayan disahkan wujud dalam binaan.
+- `apksigner verify`: tandatangan v2 sah, kunci debug tempatan yang sama (SHA-256 sijil `f193a1df…4292`).
+- `aapt dump badging`: versi 1.5.0, versionCode 6, minimum API 24, sasaran API 36; kebenaran `INTERNET` dan `com.android.vending.BILLING`.
+
+## Semakan emulator (API 36)
+
+- APK dipasang sebagai kemas kini ke atas 1.4.0. Tiga rutin sedia ada kekal. Menekan **Cipta Latihan** membuka halaman PULSE Pro.
+- Kamera versi percuma: tema Lutsinar dan seretan dikunci, butang **Buka Ciri Pro** dipaparkan, watermark PULSE di penjuru atas kanan pratonton.
+- Rakaman percuma dieksport dan disimpan ke galeri; bingkai saat 3 MP4 menunjukkan watermark PULSE di atas kanan dan panel pemasa di bawah.
+- Play Store emulator tidak mempunyai akaun dan aplikasi belum wujud dalam Play Console, jadi halaman Pro memaparkan mesej Google Play tidak dapat dihubungi; aplikasi kekal stabil. Tiada ralat AndroidRuntime atau Flutter dalam log.
+
+## Pelayan pengesahan
+
+- Cloud Run `pulse-billing` (projek `bisiq-backend`) dideploy; `/health` OK, permintaan tidak sah ditolak dengan `400`.
+- Semakan baca-sahaja sebagai service account `bisiq-play-api` memulangkan `Package not found: com.pulseworkout.gym_timer`. Pembelian sebenar belum boleh diuji sehingga aplikasi dan produk dicipta dalam Play Console dan service account diberi akses (lihat `backend/README.md`).
+
+APK: `build/releases/pulse-v1.5.0.apk`
+
+SHA-256:
+
+```text
+e04978a887d8cd80f311fff687461e229194b9ac7b0e97b7f0f178e7e5b8ff71
+```
+
+Bukti visual:
+
+- [Halaman PULSE Pro](screenshots/pro-offer-v1.5.png)
+- [MP4 percuma dengan watermark](screenshots/video-watermark-v1.5.png)
+
+---
+
 # Pengesahan binaan 1.4.0+5
 
 Tarikh: 8 Oktober 2026

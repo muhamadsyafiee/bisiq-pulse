@@ -17,6 +17,7 @@ abstract class RecordingArchive {
     WorkoutPlan plan, {
     CameraDisplaySettings? display,
     String languageCode = 'ms',
+    bool watermarked = true,
   });
   Future<List<WorkoutRecording>> list();
   Future<WorkoutRecording> export(WorkoutRecording recording);
@@ -49,12 +50,14 @@ class DeviceRecordingArchive implements RecordingArchive {
     WorkoutPlan plan, {
     CameraDisplaySettings? display,
     String languageCode = 'ms',
+    bool watermarked = true,
   }) async {
     final item = WorkoutRecording(
       id: const Uuid().v4(),
       plan: plan,
       display: display,
       languageCode: languageCode,
+      watermarked: watermarked,
       createdAt: DateTime.now(),
     );
     final raw = await _file(item.id, '-raw.mp4');
@@ -113,6 +116,7 @@ class DeviceRecordingArchive implements RecordingArchive {
       'output': temporary.path,
       'plan': item.plan.localized(AppStrings(item.languageCode)).toJson(),
       'languageCode': item.languageCode,
+      'watermarked': item.watermarked,
       'labels': {
         for (final key in [
           'finishedTitle',

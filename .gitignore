@@ -51,3 +51,11 @@ app.*.map.json
 android/key.properties
 *.jks
 *.keystore
+
+# Billing backend dependencies and secrets
+backend/node_modules/
+.env
+.env.*
+*.pem
+billing-config.json
+*service-account*.json

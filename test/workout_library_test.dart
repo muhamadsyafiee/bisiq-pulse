@@ -130,6 +130,45 @@ void main() {
     },
   );
 
+  test(
+    'free cap preserves all existing routines; Pro can create more',
+    () async {
+      final storage = MemoryLibraryStorage();
+      var pro = false;
+      final library = WorkoutLibrary(storage, hasPro: () => pro);
+      addTearDown(library.dispose);
+      await library.load();
+      for (var i = 0; i < 3; i++) {
+        await library.save(plan('$i'));
+      }
+      await expectLater(
+        library.save(plan('four')),
+        throwsA(isA<RoutineLimitReached>()),
+      );
+      expect(library.plans.length, 3);
+      pro = true;
+      await library.save(plan('four'));
+      pro = false;
+      await library.save(plan('four', name: 'Still editable'));
+      final reopened = WorkoutLibrary(storage);
+      addTearDown(reopened.dispose);
+      await reopened.load();
+      expect(reopened.plans.length, 4);
+      expect(reopened.plans.last.name, 'Still editable');
+      await expectLater(
+        reopened.save(plan('five')),
+        throwsA(isA<RoutineLimitReached>()),
+      );
+      await reopened.delete('four');
+      await expectLater(
+        reopened.save(plan('five')),
+        throwsA(isA<RoutineLimitReached>()),
+      );
+      await reopened.delete('2');
+      await reopened.save(plan('five'));
+      expect(reopened.plans.length, 3);
+    },
+  );
   test('exercise decoding rejects invalid saved times and blank names', () {
     final json = const Exercise(
       name: 'Plank',

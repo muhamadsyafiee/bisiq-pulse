@@ -52,9 +52,19 @@ class CameraWorkoutSession extends ChangeNotifier {
   String? _pendingPath;
   CameraDisplaySettings _display = const CameraDisplaySettings();
   CameraDisplaySettings get display => _display;
+  bool _pro = false;
+  bool get watermarked => !_pro;
+  void setProAccess(bool enabled) {
+    if (timer.hasStarted || _pendingPath != null || busy) return;
+    if (_pro == enabled) return;
+    _pro = enabled;
+    if (!enabled) _display = const CameraDisplaySettings();
+    _notify();
+  }
+
   void setDisplay(CameraDisplaySettings value) {
     if (status != CaptureStatus.ready || timer.hasStarted) return;
-    _display = value;
+    _display = _pro ? value : const CameraDisplaySettings();
     _notify();
   }
 
@@ -177,6 +187,7 @@ class CameraWorkoutSession extends ChangeNotifier {
         plan,
         display: _display,
         languageCode: _languageCode,
+        watermarked: watermarked,
       );
       _pendingPath = null;
       status = CaptureStatus.finished;
@@ -201,6 +212,7 @@ class CameraWorkoutSession extends ChangeNotifier {
         plan,
         display: _display,
         languageCode: _languageCode,
+        watermarked: watermarked,
       );
       _pendingPath = null;
       error = null;

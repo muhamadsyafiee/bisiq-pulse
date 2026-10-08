@@ -200,6 +200,41 @@ const messages = <String, Map<String, String>>{
     "childPose": "وضعية الطفل",
     "todaysWorkout": "تمرين اليوم",
     "interval": "تدريب متقطع",
+    "proTitle": "المزيد مع Pro.",
+    "proSubtitle": "دفعة واحدة. بلا اشتراك أو إعلانات.",
+    "proRoutines": "برامج مخصصة بلا حدود",
+    "proNoWatermark": "تسجيلات جديدة بلا علامة مائية",
+    "proPanel": "اسحب اللوحة إلى أي موضع في الفيديو",
+    "proThemes": "مظهر عادي وشفاف",
+    "proFreeFeatures":
+        "مجانًا: مؤقت كامل، كل اللغات، 3 برامج مخصصة وتسجيل كامل بعلامة مائية. تبقى البرامج الموجودة قابلة للاستخدام والتعديل.",
+    "proBuy": "احصل على PRO",
+    "proBuyPrice": "شراء PRO · {price}",
+    "proRestore": "استعادة الشراء",
+    "proActive": "PULSE Pro مفعّل",
+    "proSettings": "دفعة واحدة لمزيد من المزايا",
+    "proOffline":
+        "يلزم الإنترنت لشراء Pro أو استعادته. بعد التحقق يمكن استخدامه دون اتصال حتى 7 أيام قبل إعادة التحقق. لا حاجة للشراء مجددًا. الفيديوهات الموجودة لا تتغير.",
+    "proUnavailable":
+        "شراء Pro غير متاح في هذا الإصدار بعد. يمكنك استخدام كل المزايا المجانية.",
+    "proStoreError":
+        "تعذر الاتصال بـ Google Play. تحقق من الإنترنت وحساب المتجر، ثم حاول استعادة الشراء.",
+    "proVerifying": "جارٍ التحقق من الشراء…",
+    "proVerifyError":
+        "لم يكتمل التحقق. إذا دفعت فلا تشترِ مجددًا؛ جرّب استعادة الشراء.",
+    "proPending": "الدفع قيد الانتظار. يُفتح Pro بعد اكتمال الدفع والتحقق منه.",
+    "proCancelled": "أُلغي الشراء. يمكنك متابعة استخدام النسخة المجانية.",
+    "proActivated": "تم التحقق من الشراء. شكرًا، PULSE Pro مفعّل الآن.",
+    "proRejected":
+        "عملية شراء Pro هذه غير فعّالة. تحقق من حساب Google Play المستخدم للشراء وحاول الاستعادة مجددًا.",
+    "proNoPurchase": "لم يُعثر على شراء Pro في حساب Google Play هذا.",
+    "proRefresh":
+        "اتصل بالإنترنت واستعد الشراء لإعادة التحقق من Pro. برامجك ما زالت محفوظة.",
+    "proRestoreHint": "إذا دفعت فاضغط استعادة الشراء للتحقق من حالته.",
+    "proCameraHint":
+        "مجانًا: لوحة سفلية وعلامة مائية. افتح Pro للسحب والمظهر الشفاف.",
+    "proCameraUnlock": "افتح مزايا PRO",
+    "panelLockedSemantics": "لوحة المؤقت.",
   },
   "en": {
     "settings": "Settings",
@@ -410,6 +445,44 @@ const messages = <String, Map<String, String>>{
     "childPose": "Child’s Pose",
     "todaysWorkout": "TODAY’S WORKOUT",
     "interval": "INTERVAL",
+    "proTitle": "Do more with Pro.",
+    "proSubtitle": "One payment. No subscription or ads.",
+    "proRoutines": "Unlimited custom routines",
+    "proNoWatermark": "New recordings without watermark",
+    "proPanel": "Drag the panel anywhere in the video",
+    "proThemes": "Standard and Transparent themes",
+    "proFreeFeatures":
+        "Free: full timer, all languages, 3 custom routines and full recordings with a watermark. Existing routines remain usable and editable.",
+    "proBuy": "GET PRO",
+    "proBuyPrice": "BUY PRO · {price}",
+    "proRestore": "RESTORE PURCHASE",
+    "proActive": "PULSE Pro is active",
+    "proSettings": "One payment for more freedom",
+    "proOffline":
+        "Internet is needed to buy or restore Pro. After verification, Pro works offline for up to 7 days before rechecking. You do not need to buy again. Existing videos are unchanged.",
+    "proUnavailable":
+        "Pro purchases are not available in this version yet. You can still use all free features.",
+    "proStoreError":
+        "Could not connect to Google Play. Check your internet and Play Store account, then try restoring your purchase.",
+    "proVerifying": "Verifying purchase…",
+    "proVerifyError":
+        "Verification is not complete. If you have paid, do not buy again; try Restore Purchase.",
+    "proPending":
+        "Payment is pending. Pro unlocks once payment completes and is verified.",
+    "proCancelled":
+        "Purchase cancelled. You can continue using the free version.",
+    "proActivated": "Purchase verified. Thank you, PULSE Pro is now active.",
+    "proRejected":
+        "This Pro purchase is not active. Check the Google Play account used to buy it and try restoring again.",
+    "proNoPurchase": "No Pro purchase was found on this Google Play account.",
+    "proRefresh":
+        "Connect to the internet and restore your purchase to recheck Pro. Your routines are still saved.",
+    "proRestoreHint":
+        "If you have paid, tap Restore Purchase to check its status.",
+    "proCameraHint":
+        "Free: bottom panel with watermark. Unlock Pro for dragging and Transparent theme.",
+    "proCameraUnlock": "UNLOCK PRO FEATURES",
+    "panelLockedSemantics": "Timer panel.",
   },
   "id": {
     "settings": "Pengaturan",
@@ -622,6 +695,45 @@ const messages = <String, Map<String, String>>{
     "childPose": "Pose Anak",
     "todaysWorkout": "LATIHAN HARI INI",
     "interval": "INTERVAL",
+    "proTitle": "Lebih bebas dengan Pro.",
+    "proSubtitle": "Sekali bayar. Tanpa langganan atau iklan.",
+    "proRoutines": "Rutinitas sendiri tanpa batas",
+    "proNoWatermark": "Rekaman baru tanpa tanda air",
+    "proPanel": "Geser panel ke mana saja dalam video",
+    "proThemes": "Tema Standar dan Transparan",
+    "proFreeFeatures":
+        "Gratis: timer lengkap, semua bahasa, 3 rutinitas sendiri dan rekaman penuh dengan tanda air. Rutinitas lama tetap dapat digunakan dan diedit.",
+    "proBuy": "DAPATKAN PRO",
+    "proBuyPrice": "BELI PRO · {price}",
+    "proRestore": "PULIHKAN PEMBELIAN",
+    "proActive": "PULSE Pro aktif",
+    "proSettings": "Sekali bayar untuk lebih banyak kebebasan",
+    "proOffline":
+        "Internet diperlukan untuk membeli atau memulihkan Pro. Setelah verifikasi, Pro dapat digunakan offline hingga 7 hari sebelum diperiksa ulang. Tidak perlu membeli lagi. Video lama tidak diubah.",
+    "proUnavailable":
+        "Pembelian Pro belum tersedia di versi ini. Semua fitur gratis tetap dapat digunakan.",
+    "proStoreError":
+        "Tidak dapat terhubung ke Google Play. Periksa internet dan akun Play Store, lalu coba pulihkan pembelian.",
+    "proVerifying": "Memverifikasi pembelian…",
+    "proVerifyError":
+        "Verifikasi belum selesai. Jika sudah membayar, jangan membeli lagi; coba Pulihkan Pembelian.",
+    "proPending":
+        "Pembayaran masih tertunda. Pro terbuka setelah pembayaran selesai dan diverifikasi.",
+    "proCancelled":
+        "Pembelian dibatalkan. Anda dapat terus menggunakan versi gratis.",
+    "proActivated":
+        "Pembelian terverifikasi. Terima kasih, PULSE Pro kini aktif.",
+    "proRejected":
+        "Pembelian Pro ini tidak aktif. Periksa akun Google Play saat membeli dan coba pulihkan lagi.",
+    "proNoPurchase": "Tidak ada pembelian Pro pada akun Google Play ini.",
+    "proRefresh":
+        "Hubungkan internet dan pulihkan pembelian untuk memeriksa ulang Pro. Rutinitas Anda tetap tersimpan.",
+    "proRestoreHint":
+        "Jika sudah membayar, tekan Pulihkan Pembelian untuk memeriksa statusnya.",
+    "proCameraHint":
+        "Gratis: panel bawah dengan tanda air. Buka Pro untuk menggeser dan tema Transparan.",
+    "proCameraUnlock": "BUKA FITUR PRO",
+    "panelLockedSemantics": "Panel timer.",
   },
   "ms": {
     "settings": "Tetapan",
@@ -835,6 +947,44 @@ const messages = <String, Map<String, String>>{
     "childPose": "Posisi Kanak-kanak",
     "todaysWorkout": "LATIHAN HARI INI",
     "interval": "INTERVAL",
+    "proTitle": "Lebih bebas dengan Pro.",
+    "proSubtitle": "Sekali bayar. Tiada langganan atau iklan.",
+    "proRoutines": "Rutin sendiri tanpa had",
+    "proNoWatermark": "Rakaman baharu tanpa watermark",
+    "proPanel": "Seret panel ke mana-mana dalam video",
+    "proThemes": "Tema Standard dan Lutsinar",
+    "proFreeFeatures":
+        "Percuma: pemasa lengkap, semua bahasa, 3 rutin sendiri dan rakaman penuh dengan watermark. Rutin lama kekal boleh digunakan dan diedit.",
+    "proBuy": "DAPATKAN PRO",
+    "proBuyPrice": "BELI PRO · {price}",
+    "proRestore": "PULIHKAN PEMBELIAN",
+    "proActive": "PULSE Pro aktif",
+    "proSettings": "Sekali bayar untuk lebih banyak kebebasan",
+    "proOffline":
+        "Internet diperlukan untuk membeli atau memulihkan Pro. Selepas pengesahan, Pro boleh digunakan luar talian sehingga 7 hari sebelum perlu disahkan semula. Pembelian tidak perlu diulang. Video lama tidak diubah.",
+    "proUnavailable":
+        "Pembelian Pro belum tersedia dalam versi ini. Anda masih boleh menggunakan semua fungsi percuma.",
+    "proStoreError":
+        "Google Play tidak dapat dihubungi. Semak internet dan akaun Play Store, kemudian cuba pulihkan pembelian.",
+    "proVerifying": "Mengesahkan pembelian…",
+    "proVerifyError":
+        "Pengesahan belum selesai. Jika bayaran telah dibuat, jangan beli lagi; cuba Pulihkan Pembelian.",
+    "proPending":
+        "Bayaran masih menunggu. Pro akan dibuka selepas bayaran selesai dan disahkan.",
+    "proCancelled":
+        "Pembelian dibatalkan. Anda boleh terus menggunakan versi percuma.",
+    "proActivated": "Pembelian disahkan. Terima kasih, PULSE Pro kini aktif.",
+    "proRejected":
+        "Pembelian Pro ini tidak aktif. Semak akaun Google Play yang digunakan untuk membeli dan cuba pulihkan semula.",
+    "proNoPurchase": "Tiada pembelian Pro ditemui pada akaun Google Play ini.",
+    "proRefresh":
+        "Sambung ke internet dan pulihkan pembelian untuk mengesahkan semula Pro. Rutin anda kekal disimpan.",
+    "proRestoreHint":
+        "Jika bayaran sudah dibuat, tekan Pulihkan Pembelian untuk menyemak statusnya.",
+    "proCameraHint":
+        "Percuma: panel bawah dengan watermark. Buka Pro untuk seretan dan tema Lutsinar.",
+    "proCameraUnlock": "BUKA CIRI PRO",
+    "panelLockedSemantics": "Panel pemasa.",
   },
   "ta": {
     "settings": "அமைப்புகள்",
@@ -1056,6 +1206,45 @@ const messages = <String, Map<String, String>>{
     "childPose": "குழந்தை நிலை",
     "todaysWorkout": "இன்றைய பயிற்சி",
     "interval": "இடைவெளிப் பயிற்சி",
+    "proTitle": "Pro மூலம் மேலும் செய்யுங்கள்.",
+    "proSubtitle": "ஒருமுறை கட்டணம். சந்தாவோ விளம்பரங்களோ இல்லை.",
+    "proRoutines": "வரம்பற்ற தனிப்பயன் திட்டங்கள்",
+    "proNoWatermark": "புதிய பதிவுகளில் நீர்க்குறி இல்லை",
+    "proPanel": "காணொளியில் பலகையை விரும்பிய இடத்திற்கு இழுக்கலாம்",
+    "proThemes": "வழக்கமான மற்றும் ஒளிபுகும் தோற்றங்கள்",
+    "proFreeFeatures":
+        "இலவசம்: முழு நேரங்காட்டி, அனைத்து மொழிகள், 3 தனிப்பயன் திட்டங்கள் மற்றும் நீர்க்குறியுடன் முழுப் பதிவு. பழைய திட்டங்களைத் தொடர்ந்து பயன்படுத்தித் திருத்தலாம்.",
+    "proBuy": "PRO பெறுங்கள்",
+    "proBuyPrice": "PRO வாங்கு · {price}",
+    "proRestore": "வாங்கியதை மீட்டெடு",
+    "proActive": "PULSE Pro செயல்பாட்டில் உள்ளது",
+    "proSettings": "மேலும் வசதிகளுக்கு ஒருமுறை கட்டணம்",
+    "proOffline":
+        "Pro வாங்க அல்லது மீட்டெடுக்க இணையம் தேவை. சரிபார்த்த பின் 7 நாட்கள் வரை இணையமின்றிப் பயன்படுத்தலாம்; பின்னர் மீண்டும் சரிபார்க்க வேண்டும். மீண்டும் வாங்கத் தேவையில்லை. பழைய காணொளிகள் மாறாது.",
+    "proUnavailable":
+        "இந்தப் பதிப்பில் Pro வாங்குதல் இன்னும் கிடைக்கவில்லை. அனைத்து இலவச வசதிகளையும் பயன்படுத்தலாம்.",
+    "proStoreError":
+        "Google Play உடன் இணைக்க முடியவில்லை. இணையத்தையும் Play Store கணக்கையும் சரிபார்த்து வாங்கியதை மீட்டெடுக்கவும்.",
+    "proVerifying": "வாங்கியதைச் சரிபார்க்கிறது…",
+    "proVerifyError":
+        "சரிபார்ப்பு முடியவில்லை. பணம் செலுத்தியிருந்தால் மீண்டும் வாங்க வேண்டாம்; வாங்கியதை மீட்டெடுக்கவும்.",
+    "proPending":
+        "கட்டணம் நிலுவையில் உள்ளது. கட்டணம் முடிந்து சரிபார்த்ததும் Pro திறக்கப்படும்.",
+    "proCancelled":
+        "வாங்குதல் ரத்தானது. இலவசப் பதிப்பைத் தொடர்ந்து பயன்படுத்தலாம்.",
+    "proActivated":
+        "வாங்கியது சரிபார்க்கப்பட்டது. நன்றி, PULSE Pro இப்போது செயல்பாட்டில் உள்ளது.",
+    "proRejected":
+        "இந்த Pro வாங்குதல் செயல்பாட்டில் இல்லை. வாங்கிய Google Play கணக்கைச் சரிபார்த்து மீண்டும் மீட்டெடுக்கவும்.",
+    "proNoPurchase": "இந்த Google Play கணக்கில் Pro வாங்குதல் இல்லை.",
+    "proRefresh":
+        "இணையத்தில் இணைந்து வாங்கியதை மீட்டெடுத்து Pro ஐ மீண்டும் சரிபார்க்கவும். உங்கள் திட்டங்கள் சேமிக்கப்பட்டுள்ளன.",
+    "proRestoreHint":
+        "பணம் செலுத்தியிருந்தால் நிலையை அறிய வாங்கியதை மீட்டெடுக்கவும்.",
+    "proCameraHint":
+        "இலவசம்: கீழே பலகை, நீர்க்குறியுடன். இழுக்கவும் ஒளிபுகும் தோற்றத்திற்கும் Pro பெறுங்கள்.",
+    "proCameraUnlock": "PRO வசதிகளைத் திற",
+    "panelLockedSemantics": "நேரங்காட்டிப் பலகை.",
   },
   "zh": {
     "settings": "设置",
@@ -1245,5 +1434,32 @@ const messages = <String, Map<String, String>>{
     "childPose": "婴儿式",
     "todaysWorkout": "今日训练",
     "interval": "间歇训练",
+    "proTitle": "用 Pro 解锁更多功能。",
+    "proSubtitle": "一次购买，无订阅，无广告。",
+    "proRoutines": "不限数量的自定义训练",
+    "proNoWatermark": "新录制的视频无水印",
+    "proPanel": "自由拖动视频中的面板",
+    "proThemes": "标准和透明主题",
+    "proFreeFeatures": "免费：完整计时器、所有语言、3 个自定义训练和带水印的完整录制。已有训练仍可使用和编辑。",
+    "proBuy": "获取 PRO",
+    "proBuyPrice": "购买 PRO · {price}",
+    "proRestore": "恢复购买",
+    "proActive": "PULSE Pro 已启用",
+    "proSettings": "一次购买，解锁更多功能",
+    "proOffline": "购买或恢复 Pro 需要联网。验证后可离线使用最多 7 天，之后需再次验证。无需重复购买。已有视频保持不变。",
+    "proUnavailable": "此版本暂不支持购买 Pro。所有免费功能仍可使用。",
+    "proStoreError": "无法连接 Google Play。请检查网络和 Play 商店账号，然后尝试恢复购买。",
+    "proVerifying": "正在验证购买…",
+    "proVerifyError": "验证尚未完成。如果已付款，请勿再次购买；请尝试恢复购买。",
+    "proPending": "付款待处理。付款完成并通过验证后将启用 Pro。",
+    "proCancelled": "购买已取消。您可继续使用免费版。",
+    "proActivated": "购买已验证。谢谢，PULSE Pro 现已启用。",
+    "proRejected": "此 Pro 购买未生效。请检查购买时使用的 Google Play 账号，再次尝试恢复。",
+    "proNoPurchase": "此 Google Play 账号没有 Pro 购买记录。",
+    "proRefresh": "请联网并恢复购买以重新验证 Pro。您的训练仍已保存。",
+    "proRestoreHint": "如果已付款，请点按恢复购买以检查状态。",
+    "proCameraHint": "免费版：底部面板和水印。解锁 Pro 可拖动面板并使用透明主题。",
+    "proCameraUnlock": "解锁 PRO 功能",
+    "panelLockedSemantics": "计时器面板。",
   },
 };

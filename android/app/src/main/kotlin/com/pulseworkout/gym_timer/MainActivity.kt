@@ -62,7 +62,7 @@ class MainActivity : FlutterActivity() {
                             require(!output.exists())
                             val overlay = WorkoutVideoOverlay(plan, call.argument<Map<String, Any?>>("display"), requireNotNull(call.argument<Map<String, String>>("labels")), call.argument<String>("languageCode") ?: "ms")
                             val item = EditedMediaItem.Builder(MediaItem.fromUri(Uri.fromFile(File(source))))
-                                .setEffects(Effects(emptyList(), listOf(OverlayEffect(ImmutableList.of<TextureOverlay>(overlay)))))
+                                .setEffects(Effects(emptyList(), listOf(OverlayEffect(ImmutableList.copyOf(mutableListOf<TextureOverlay>(overlay).apply { if (call.argument<Boolean>("watermarked") == true) add(PulseWatermarkOverlay()) })))))
                                 .build()
                             pendingResult = result
                             pendingOutput = output

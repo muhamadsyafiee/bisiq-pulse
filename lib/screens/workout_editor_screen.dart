@@ -1,3 +1,4 @@
+import 'pro_screen.dart';
 import '../l10n/app_strings.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -134,6 +135,11 @@ class _WorkoutEditorScreenState extends State<WorkoutEditorScreen> {
     try {
       await widget.library.save(plan);
       if (mounted) Navigator.pop(context, true);
+    } on RoutineLimitReached {
+      if (mounted) {
+        setState(() => _saving = false);
+        await showPro(context);
+      }
     } catch (_) {
       if (mounted) {
         setState(() {

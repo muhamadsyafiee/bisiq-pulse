@@ -1,3 +1,5 @@
+import 'pro_screen.dart';
+import '../services/pro_controller.dart';
 import '../l10n/app_strings.dart';
 import 'dart:async';
 import 'dart:math' as math;
@@ -70,9 +72,23 @@ class _CameraWorkoutScreenState extends State<CameraWorkoutScreen>
     }
     if (!mounted) return;
     // Permission errors can be retried later; retain the loaded settings.
+    _preferredDisplay = settings;
+    _session.setProAccess(ProScope.active(context));
     _loadedDisplay = settings;
     if (_session.status == CaptureStatus.ready) _session.setDisplay(settings);
     setState(() => _displayLoaded = true);
+  }
+
+  CameraDisplaySettings _preferredDisplay = const CameraDisplaySettings();
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    final pro = ProScope.active(context);
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted || _session.timer.hasStarted) return;
+      _session.setProAccess(pro);
+      if (_displayLoaded) _session.setDisplay(_preferredDisplay);
+    });
   }
 
   CameraDisplaySettings? _loadedDisplay;
@@ -80,6 +96,7 @@ class _CameraWorkoutScreenState extends State<CameraWorkoutScreen>
     context,
   ).showSnackBar(SnackBar(content: Text(message)));
   Future<void> _saveDisplay() async {
+    if (!ProScope.active(context)) return;
     try {
       await _displayStore.save(_session.display);
     } catch (_) {
@@ -91,6 +108,7 @@ class _CameraWorkoutScreenState extends State<CameraWorkoutScreen>
 
   void _setDisplay(CameraDisplaySettings value) {
     _loadedDisplay = null;
+    _preferredDisplay = value;
     _session.setDisplay(value);
   }
 
@@ -297,6 +315,10 @@ class _CameraWorkoutScreenState extends State<CameraWorkoutScreen>
                           selected: _session.display.transparent,
                           onSelected: editable
                               ? (_) {
+                                  if (!ProScope.active(context)) {
+                                    showPro(context);
+                                    return;
+                                  }
                                   _setDisplay(
                                     _session.display.copyWith(
                                       transparent: true,
@@ -318,12 +340,24 @@ class _CameraWorkoutScreenState extends State<CameraWorkoutScreen>
                         ),
                       ],
                     ),
+                    if (editable && !ProScope.active(context))
+                      TextButton.icon(
+                        onPressed: () => showPro(context),
+                        icon: const Icon(Icons.lock_outline),
+                        label: Text(
+                          AppStrings.of(context).text('proCameraUnlock'),
+                        ),
+                      ),
                     Padding(
                       padding: EdgeInsets.only(bottom: 8),
                       child: Text(
                         _session.isRecording
                             ? AppStrings.of(context).text('displayLocked')
-                            : AppStrings.of(context).text('dragHint'),
+                            : AppStrings.of(context).text(
+                                ProScope.active(context)
+                                    ? 'dragHint'
+                                    : 'proCameraHint',
+                              ),
                         textAlign: TextAlign.center,
                         style: TextStyle(fontSize: 11, color: Colors.white70),
                       ),
@@ -338,9 +372,39 @@ class _CameraWorkoutScreenState extends State<CameraWorkoutScreen>
                               fit: StackFit.expand,
                               children: [
                                 _session.capture.preview(),
+                                if (_session.watermarked)
+                                  const Positioned(
+                                    top: 14,
+                                    right: 14,
+                                    child: DecoratedBox(
+                                      decoration: BoxDecoration(
+                                        color: Colors.black54,
+                                        borderRadius: BorderRadius.all(
+                                          Radius.circular(6),
+                                        ),
+                                      ),
+                                      child: Padding(
+                                        padding: EdgeInsets.symmetric(
+                                          horizontal: 10,
+                                          vertical: 5,
+                                        ),
+                                        child: Text(
+                                          'PULSE',
+                                          style: TextStyle(
+                                            color: Colors.white,
+                                            fontWeight: FontWeight.w900,
+                                            letterSpacing: 2,
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                  ),
                                 DraggableCameraPanel(
                                   settings: _session.display,
-                                  onChanged: editable ? _setDisplay : null,
+                                  onChanged:
+                                      editable && ProScope.active(context)
+                                      ? _setDisplay
+                                      : null,
                                   onChangeEnd: () => unawaited(_saveDisplay()),
                                   child: CameraTimerPanel(
                                     plan: widget.plan,
@@ -412,6 +476,9 @@ class _CameraWorkoutScreenState extends State<CameraWorkoutScreen>
                               ? _session.stop
                               : _session.status == CaptureStatus.ready
                               ? () {
+                                  _session.setProAccess(
+                                    ProScope.active(context),
+                                  );
                                   _session.setLanguage(
                                     AppStrings.of(context).code,
                                   );

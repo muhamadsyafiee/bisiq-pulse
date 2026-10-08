@@ -1,3 +1,5 @@
+import 'package:gym_timer/services/pro_controller.dart';
+import 'pro_test_support.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:gym_timer/l10n/app_strings.dart';
 import 'package:gym_timer/models/camera_display_settings.dart';
@@ -99,6 +101,8 @@ void main() {
       tester.view.devicePixelRatio = 1;
       addTearDown(tester.view.resetPhysicalSize);
       addTearDown(tester.view.resetDevicePixelRatio);
+      final pro = TestProController();
+      addTearDown(pro.dispose);
       final store = MemoryDisplayStore();
       final plan = WorkoutPlan(
         id: 'drag',
@@ -116,12 +120,15 @@ void main() {
       );
       final first = session();
       Future<void> show(CameraWorkoutSession active) => tester.pumpWidget(
-        MaterialApp(
-          theme: buildAppTheme(),
-          home: CameraWorkoutScreen(
-            plan: plan,
-            session: active,
-            displayStore: store,
+        ProScope(
+          controller: pro,
+          child: MaterialApp(
+            theme: buildAppTheme(),
+            home: CameraWorkoutScreen(
+              plan: plan,
+              session: active,
+              displayStore: store,
+            ),
           ),
         ),
       );

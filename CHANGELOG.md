@@ -1,5 +1,28 @@
 # Changelog
 
+## [1.5.0] — 2026-10-08
+
+### Ditambah
+
+- **PULSE Pro** sebagai pembelian sekali bayar melalui Google Play Billing (produk `pulse_pro_lifetime`; harga permulaan dirancang RM19.90 dan dibaca terus daripada Google Play). Tiada langganan atau iklan.
+- Versi percuma: pemasa penuh, bunyi, semua bahasa, sehingga 3 rutin sendiri dan rakaman penuh dengan watermark PULSE pada pratonton serta MP4 eksport. Panel pemasa menggunakan kedudukan asas (bawah) dan tema Standard.
+- Pro: rutin tanpa had, rakaman baharu tanpa watermark, panel boleh diseret ke mana-mana dan tema Lutsinar.
+- Halaman Pro dalam Tetapan, serta tawaran Pro hanya apabila pengguna mencipta rutin keempat atau memilih ciri kamera Pro sebelum merakam. Rakaman yang sedang berjalan tidak diganggu.
+- **Pulihkan Pembelian** untuk telefon baharu atau pemasangan semula; pembelian disemak semula secara automatik apabila aplikasi dibuka.
+- Pelayan pengesahan (`backend/`) yang menyemak pembelian dengan Google Play Developer API, mengakui (acknowledge) pembelian, kemudian mengeluarkan lesen bertandatangan Ed25519 untuk pemasangan itu. Pro boleh digunakan luar talian sehingga 7 hari sebelum disahkan semula.
+
+### Keserasian
+
+- Rutin sedia ada tidak dipadam atau dikunci walaupun melebihi 3; semuanya kekal boleh dibuka, diedit dan dirakam. Hanya rutin baharu yang memerlukan Pro.
+- Rakaman lama dan video yang sudah dieksport tidak diubah; rakaman sebelum versi ini dieksport tanpa watermark seperti asal.
+- APK GitHub versi lama kekal boleh digunakan.
+
+### Had diketahui
+
+- **Pembelian belum boleh dibuat lagi.** Aplikasi `com.pulseworkout.gym_timer` belum wujud dalam akaun Play Console yang boleh diakses oleh pelayan pengesahan, dan produk `pulse_pro_lifetime` belum dicipta. Sehingga itu, halaman Pro memaparkan mesej bahawa Google Play tidak dapat dihubungi dan semua ciri percuma kekal berfungsi.
+- Google Play Billing hanya berfungsi untuk pemasangan daripada Play Store. APK GitHub ini (ditandatangani dengan kunci debug tempatan) memaparkan had versi percuma tetapi tidak boleh membeli Pro.
+- Pengguna yang mengalihkan pemasangan daripada APK GitHub ke Play Store perlu nyahpasang dahulu kerana kunci tandatangan berbeza; rutin dan rakaman dalam aplikasi tidak dipindahkan secara automatik.
+
 ## [1.4.0] — 2026-10-08
 
 ### Ditambah

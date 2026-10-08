@@ -1,3 +1,5 @@
+import 'pro_screen.dart';
+import '../services/pro_controller.dart';
 import 'package:flutter/material.dart';
 import '../l10n/app_strings.dart';
 import '../services/language_controller.dart';
@@ -48,6 +50,18 @@ class SettingsScreen extends StatelessWidget {
               ),
             const SizedBox(height: 20),
             Text(s.text('customTextHint')),
+            const Divider(height: 48),
+            ListTile(
+              key: const Key('open-pro'),
+              contentPadding: EdgeInsets.zero,
+              leading: const Icon(Icons.workspace_premium_rounded),
+              title: const Text('PULSE PRO'),
+              subtitle: Text(
+                s.text(ProScope.active(context) ? 'proActive' : 'proSettings'),
+              ),
+              trailing: const Icon(Icons.chevron_right),
+              onTap: () => showPro(context),
+            ),
           ],
         ),
       ),

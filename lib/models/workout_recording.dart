@@ -8,6 +8,7 @@ class WorkoutRecording {
     required this.createdAt,
     this.display,
     this.languageCode = 'ms',
+    this.watermarked = true,
     this.exported = false,
     this.gallerySaved = false,
   });
@@ -16,6 +17,7 @@ class WorkoutRecording {
   final DateTime createdAt;
   final CameraDisplaySettings? display;
   final String languageCode;
+  final bool watermarked;
   final bool exported;
   final bool gallerySaved;
 
@@ -26,6 +28,7 @@ class WorkoutRecording {
         createdAt: createdAt,
         display: display,
         languageCode: languageCode,
+        watermarked: watermarked,
         exported: exported ?? this.exported,
         gallerySaved: gallerySaved ?? this.gallerySaved,
       );
@@ -35,6 +38,7 @@ class WorkoutRecording {
     'createdAt': createdAt.toIso8601String(),
     if (display != null) 'display': display!.toJson(),
     'languageCode': languageCode,
+    'watermarked': watermarked,
     'exported': exported,
     'gallerySaved': gallerySaved,
   };
@@ -65,6 +69,8 @@ class WorkoutRecording {
           ].contains(json['languageCode'])
           ? json['languageCode'] as String
           : 'ms',
+      // Pre-Pro recordings preserve the original export appearance.
+      watermarked: json['watermarked'] == true,
       exported: json['exported'] == true,
       gallerySaved: json['gallerySaved'] == true,
     );
