@@ -28,14 +28,18 @@ Menukar kunci peribadi memerlukan kunci awam baharu dalam `config/pulse_billing.
 Selesai (9 Oktober 2026):
 
 - Aplikasi `com.pulseworkout.gym_timer` wujud dan service account mempunyai akses.
-- AAB 1.5.1 (versionCode 7), ditandatangani dengan kunci muat naik, berada dalam trek ujian dalaman sebagai draf.
+- AAB 1.5.1 (versionCode 7), ditandatangani dengan kunci muat naik, aktif dalam trek ujian dalaman; Play Console menunjukkan **Available to internal testers**, dilancarkan pada 9 Oktober, 2:00 pagi.
 - Produk `pulse_pro_lifetime`, pilihan beli `lifetime` (legacy compatible), AKTIF pada RM19.90 di Malaysia.
+- Senarai e-mel **Bisiq internal** dipilih untuk ujian dalaman dan ujian lesen, dengan respons `RESPOND_NORMALLY`. Akaun penguji yang diberikan pengguna sudah berada dalam senarai dan sudah menyertai program ujian.
 
-Masih perlu dibuat dalam Play Console:
+Ujian seterusnya pada telefon:
 
-1. **Ujian dalaman** → tambah senarai penguji (e-mel Google) → semak dan lancarkan keluaran draf 1.5.1.
-2. **Tetapan → Ujian lesen** → tambah akaun penguji yang sama supaya pembelian ujian tidak dicaj.
-3. Pada telefon penguji, buka pautan opt-in ujian dalaman, nyahpasang APK GitHub jika ada, pasang PULSE daripada Play Store, kemudian uji beli, pembayaran tertunda, bayaran balik dan **Pulihkan Pembelian**.
+1. Log masuk Play Store menggunakan akaun penguji yang didaftarkan. Buka [pautan ujian dalaman](https://play.google.com/apps/internaltest/4701082394880794363) dan pilih **Download test app**.
+2. Jika APK GitHub masih dipasang, simpan video yang diperlukan ke galeri dan catat rutin dahulu, kemudian nyahpasang APK itu. Kunci tandatangan Play Store berbeza; nyahpasang memadam data tempatan aplikasi.
+3. Pasang PULSE daripada Play Store dan buka **Tetapan → PULSE Pro**. Pilih kaedah ujian seperti **Test card, always approves**; jangan teruskan jika dialog menunjukkan kaedah bayaran sebenar. Sahkan ciri Pro dibuka selepas pengesahan pelayan.
+4. Uji **Pulihkan Pembelian**, pembayaran tertunda/ditolak dan pembatalan/bayaran balik ujian. Rekod hasil sebelum keluaran awam; ujian ini belum dilakukan pada telefon.
+
+Nama sementara `com.pulseworkout.gym_timer (unreviewed)` masih digunakan sehingga persediaan aplikasi dan semakan Google Play selesai. Ujian dalaman ini bukan keluaran awam.
 
 Membina dan memuat naik AAB baharu:
 

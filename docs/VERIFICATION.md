@@ -7,7 +7,10 @@ Tarikh: 9 Oktober 2026
 - AAB Play (58,765,994 bait, SHA-256 `4c4e5f18…21ba`) ditandatangani dengan kunci muat naik (sijil SHA-256 `A6:DC:2C:76…75:78`). Amaran Flutter tentang strip simbol berlaku kerana `cmdline-tools` tiada pada mesin; `llvm-objdump` mengesahkan tiada seksyen `.debug_*` dalam semua pustaka native AAB.
 - Google Play Developer API: AAB diterima (versionCode 7, SHA-256 sepadan) dan dimasukkan ke trek internal sebagai draf. Produk `pulse_pro_lifetime` dicipta dan pilihan beli `lifetime` berstatus ACTIVE, RM19.90 di Malaysia.
 - Pelayan `pulse-billing` kini boleh membaca aplikasi PULSE; token palsu dipulangkan sebagai `403` oleh Google, bukan ralat konfigurasi.
-- Pembelian sebenar pada telefon belum diuji; keluaran internal masih draf.
+- Semakan Play Console melalui UI pada 9 Oktober: trek internal **Active**, keluaran 1.5.1 **Available to internal testers**, dilancarkan pada 2:00 pagi. Senarai **Bisiq internal** dipilih untuk trek dan penguji lesen (`RESPOND_NORMALLY`). Akaun yang diberikan pengguna ada dalam senarai; pautan opt-in menunjukkan **You're a tester** untuk akaun itu.
+- Pelayan `/health` dipanggil semula dan memulangkan `{"status":"ok"}`. Pembelian/pemulihan Pro pada telefon belum diuji; status kesihatan ini tidak membuktikan transaksi pembelian berjaya.
+- [Pautan ujian dalaman](https://play.google.com/apps/internaltest/4701082394880794363) menyediakan **Download test app**. Aplikasi masih menggunakan nama sementara sehingga disemak Google Play.
+- Kemas kini status penghantaran ini hanya mengubah dokumentasi; APK/AAB dan keputusan pengesahan binaan di atas digunakan semula tanpa membina atau menukar versi.
 
 APK: `build/releases/pulse-v1.5.1.apk`
 

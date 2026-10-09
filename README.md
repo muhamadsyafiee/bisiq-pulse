@@ -54,10 +54,11 @@ APK release untuk GitHub menggunakan debug signing untuk pemasangan dan ujian te
 | Kedudukan panel | Kedudukan asas (bawah) | Bebas seret |
 | Tema kamera | Standard | Standard + Lutsinar |
 
-- Sekali bayar melalui Google Play (`pulse_pro_lifetime`, harga permulaan dirancang RM19.90). Tiada langganan atau iklan.
+- Sekali bayar melalui Google Play (`pulse_pro_lifetime`, RM19.90 di Malaysia). Tiada langganan atau iklan.
 - Rutin sedia ada tidak pernah dikunci walaupun melebihi had. Tawaran Pro dipaparkan apabila mencipta rutin keempat atau memilih ciri kamera Pro sebelum merakam, bukan semasa latihan berjalan.
 - Pembelian disahkan oleh pelayan (`backend/`) sebelum Pro dibuka. Pelayan memberi lesen bertandatangan yang terikat pada pemasangan dan sah 7 hari luar talian; aplikasi menyemak semula apabila dibuka. **Pulihkan Pembelian** digunakan selepas menukar telefon.
 - Persediaan Play Console dan pelayan: lihat [backend/README.md](backend/README.md).
+- Versi 1.5.1+7 tersedia untuk penguji yang didaftarkan melalui [ujian dalaman Google Play](https://play.google.com/apps/internaltest/4701082394880794363). Gunakan akaun penguji lesen dan kaedah bayaran ujian; transaksi pada telefon belum disahkan. APK GitHub kekal untuk ujian sideload dengan kunci debug, manakala ujian pembelian menggunakan pemasangan Play Store.
 
 ## Bahasa — versi 1.4.0
 
@@ -69,7 +70,7 @@ APK release untuk GitHub menggunakan debug signing untuk pemasangan dan ujian te
 - Pilihan ini meliputi enam bahasa di atas, bukan terjemahan automatik untuk setiap bahasa dunia. Semua terjemahan disertakan dalam APK; tiada teks dihantar ke perkhidmatan terjemahan.
 - Dialog milik Android/galeri bergantung pada sokongan sistem. Bahasa aplikasi diselaraskan ke Android 13+; pada Android lama, dialog sistem boleh mengikut bahasa telefon.
 
-Pakej terjemahan berada di `lib/l10n/<kod>.json` (187 mesej setiap bahasa). Selepas menyunting:
+Pakej terjemahan berada di `lib/l10n/<kod>.json` (214 mesej setiap bahasa pada versi 1.5). Selepas menyunting:
 
 ```bash
 python3 scripts/generate_localizations.py
